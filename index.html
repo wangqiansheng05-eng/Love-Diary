@@ -300,7 +300,7 @@
     }
     .hint b{color:var(--accent2)}
 
-    /* ================== 开场动画（3秒，填充式爱心 + 进度条） ================== */
+    /* ================== 开场动画（3秒，爱心填充 + 进度条 + 仪式感） ================== */
     .intro{
       position:fixed; inset:0;
       display:flex;
@@ -311,6 +311,7 @@
         radial-gradient(900px 600px at 30% 20%, #ff5da228, transparent 60%),
         radial-gradient(800px 520px at 80% 30%, #7c3aed25, transparent 60%),
         linear-gradient(140deg, var(--bg1), var(--bg2));
+      overflow:hidden;
     }
     .introCard{
       width:min(520px, 92vw);
@@ -321,6 +322,7 @@
       box-shadow: var(--shadow);
       text-align:center;
       backdrop-filter: blur(12px);
+      position:relative;
     }
     .introText{
       margin-top: 12px;
@@ -329,31 +331,52 @@
       letter-spacing:.2px;
     }
 
+    /* SVG心形 */
     .introHeart{
-      width: 120px; height: 120px;
+      width: 138px;
+      height: 138px;
       margin: 0 auto;
-      position: relative;
-      transform: rotate(45deg);
-      background: var(--accent);
+      display:block;
       filter: drop-shadow(0 14px 35px #ff5da240);
-      border-radius: 14px;
-      overflow:hidden;
+      transform-origin: 50% 60%;
+    }
+    .heartOutline{
+      fill: #ffffff10;
+      stroke: var(--accent2);
+      stroke-width: 3;
+      opacity: .95;
+    }
+    #heartFill{ fill: var(--accent); }
 
-      /* 用 inset box-shadow 模拟“从下往上填充” */
-      --fill: 0px; /* 0~120px */
-      box-shadow: inset 0 calc(120px - var(--fill)) 0 0 #ffffff22;
-      transition: box-shadow .08s linear;
+    /* 仪式感：填满瞬间轻跳一下 */
+    .introHeart.bounce{
+      animation: heartBounce .55s ease both;
     }
-    .introHeart:before,
-    .introHeart:after{
-      content:"";
+    @keyframes heartBounce{
+      0%{ transform: scale(1); }
+      30%{ transform: scale(1.12); }
+      55%{ transform: scale(0.98); }
+      100%{ transform: scale(1.05); }
+    }
+
+    /* 仪式感：闪光扫过 */
+    .spark{
       position:absolute;
-      width: 120px; height: 120px;
-      border-radius: 50%;
-      background: inherit;
+      inset:-40px -80px;
+      background: linear-gradient(110deg, transparent 40%, #ffffff30 50%, transparent 60%);
+      transform: translateX(-120%) rotate(0deg);
+      opacity:0;
+      pointer-events:none;
+      mix-blend-mode: screen;
     }
-    .introHeart:before{ left:-60px; top:0; }
-    .introHeart:after{ left:0; top:-60px; }
+    .spark.play{
+      animation: sparkSweep .7s ease both;
+      opacity:1;
+    }
+    @keyframes sparkSweep{
+      0%{ transform: translateX(-120%) }
+      100%{ transform: translateX(120%) }
+    }
 
     .bar{
       margin: 16px auto 8px;
@@ -390,8 +413,32 @@
   <!-- 开场动画层 -->
   <div id="intro" class="intro">
     <div class="introCard">
-      <div class="introHeart" aria-hidden="true"></div>
-      <div class="introText">正在把心意装进爱心里…</div>
+      <div class="spark" id="spark" aria-hidden="true"></div>
+
+      <!-- SVG 爱心（填充式） -->
+      <svg class="introHeart" id="introHeart" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <clipPath id="heartClip">
+            <path d="M50 88
+                     C20 68 6 50 18 33
+                     C27 20 42 22 50 32
+                     C58 22 73 20 82 33
+                     C94 50 80 68 50 88 Z"/>
+          </clipPath>
+        </defs>
+
+        <path class="heartOutline" d="M50 88
+                     C20 68 6 50 18 33
+                     C27 20 42 22 50 32
+                     C58 22 73 20 82 33
+                     C94 50 80 68 50 88 Z"/>
+
+        <g clip-path="url(#heartClip)">
+          <rect id="heartFill" x="0" y="100" width="100" height="0"></rect>
+        </g>
+      </svg>
+
+      <div class="introText" id="introText">正在把心意装进爱心里…</div>
 
       <div class="bar">
         <div id="barFill" class="barFill"></div>
@@ -477,7 +524,6 @@
             </p>
 
             <audio id="bgm" preload="auto" loop>
-              <!-- 你已验证可用的路径 -->
               <source src="/Love-Diary/static/bgm.mp3" type="audio/mpeg">
             </audio>
 
@@ -505,17 +551,21 @@
   </div>
 
   <script>
-    // ================== 开场：3秒进度条 + 填充式爱心 ==================
+    // ================== 开场：3秒进度条 + SVG爱心填充 + 仪式感（跳一下+闪光） ==================
     const intro = document.getElementById("intro");
     const main = document.getElementById("main");
     const barFill = document.getElementById("barFill");
     const barNum = document.getElementById("barNum");
-    const introHeart = intro.querySelector(".introHeart");
+    const heartFill = document.getElementById("heartFill");
+    const introHeart = document.getElementById("introHeart");
+    const spark = document.getElementById("spark");
+    const introText = document.getElementById("introText");
 
-    const INTRO_MS = 3000; // 3秒
+    const INTRO_MS = 3000;
 
     function runIntro(){
       const start = performance.now();
+      let celebrated = false;
 
       function tick(now){
         const t = Math.min(1, (now - start) / INTRO_MS);
@@ -524,8 +574,20 @@
         barFill.style.width = p + "%";
         barNum.textContent = p + "%";
 
-        const fillPx = Math.floor(120 * t); // 0~120px
-        introHeart.style.setProperty("--fill", fillPx + "px");
+        // SVG 填充：0~100（从下往上）
+        const fill = Math.floor(100 * t);
+        heartFill.setAttribute("y", String(100 - fill));
+        heartFill.setAttribute("height", String(fill));
+
+        // 接近满格时来一点“仪式感”
+        if(!celebrated && t >= 0.985){
+          celebrated = true;
+          introText.textContent = "装好了，送给你。";
+          spark.classList.add("play");
+          introHeart.classList.add("bounce");
+          // 顺便来一小段爱心雨（开场）
+          miniHeartBurst();
+        }
 
         if(t < 1){
           requestAnimationFrame(tick);
@@ -538,6 +600,33 @@
       }
 
       requestAnimationFrame(tick);
+    }
+
+    // 小小仪式感：开场结束前飘一点点心
+    function miniHeartBurst(){
+      const count = 18;
+      for(let i=0;i<count;i++){
+        setTimeout(()=>{
+          const h = document.createElement("div");
+          h.className = "heart";
+          // 从中间附近随机飘落
+          const x = window.innerWidth * (0.5 + (Math.random()*0.22 - 0.11));
+          const dx = (Math.random() * 2 - 1) * 90 + "px";
+          const dur = (Math.random()*0.6 + 1.4).toFixed(2) + "s";
+          const size = (Math.random()*8 + 10).toFixed(0) + "px";
+          const op = (Math.random()*0.25 + 0.55).toFixed(2);
+
+          h.style.left = x + "px";
+          h.style.setProperty("--dx", dx);
+          h.style.animationDuration = dur;
+          h.style.width = size;
+          h.style.height = size;
+          h.style.opacity = op;
+
+          document.body.appendChild(h);
+          setTimeout(()=>h.remove(), (parseFloat(dur)+0.2)*1000);
+        }, i*30);
+      }
     }
 
     runIntro();
