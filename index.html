@@ -953,49 +953,81 @@
 
     // ================== 时间线：仅4组（按你需求） ==================
     // 你只要把图片放到对应文件夹，并保证文件名一致即可
-    const TIMELINE = [
-      {
-        group: "2025-05-02 第一次见面",
-        date: "2025-05-02",
-        title: "第一次见面",
-        text: "那天开始，我就想更靠近你一点。",
-        photos: [
-          { src: "assets/photos/2025-05-02-first/01.jpg", cap: "第一次见面 01" },
-          { src: "assets/photos/2025-05-02-first/02.jpg", cap: "第一次见面 02" },
-        ]
-      },
-      {
-        group: "2025-07-02 第二次见面",
-        date: "2025-07-02",
-        title: "第二次见面",
-        text: "第二次见面，比第一次还心动。",
-        photos: [
-          { src: "assets/photos/2025-07-02-second/01.jpg", cap: "第二次见面 01" },
-          { src: "assets/photos/2025-07-02-second/02.jpg", cap: "第二次见面 02" },
-        ]
-      },
-      {
-        group: "2025-09-19 第三次见面",
-        date: "2025-09-19",
-        title: "第三次见面",
-        text: "越见越喜欢，越喜欢越坚定。",
-        photos: [
-          { src: "assets/photos/2025-09-19-third/01.jpg", cap: "第三次见面 01" },
-          { src: "assets/photos/2025-09-19-third/02.jpg", cap: "第三次见面 02" },
-        ]
-      },
-      {
-        group: "大宝宝的美照",
-        date: "2025-01-01",
-        title: "大宝宝的美照",
-        text: "只要你一笑，我就觉得今天特别好。",
-        photos: [
-          { src: "assets/photos/tongtong/01.jpg", cap: "大宝宝 01", tags:["tongtong"] },
-          { src: "assets/photos/tongtong/02.jpg", cap: "大宝宝 02", tags:["tongtong"] },
-          { src: "assets/photos/tongtong/03.jpg", cap: "大宝宝 03", tags:["tongtong"] },
-        ]
-      },
-    ];
+      const TIMELINE = [
+    // ① 2025-05-02 第一次见面（6张）
+    {
+      group: "2025-05-02 第一次见面",
+      date: "2025-05-02",
+      title: "第一次见面",
+      photos: [
+        { src: "assets/photos/2025-05-02-first/01.jpg" },
+        { src: "assets/photos/2025-05-02-first/02.jpg" },
+        { src: "assets/photos/2025-05-02-first/03.jpg" },
+        { src: "assets/photos/2025-05-02-first/04.jpg" },
+        { src: "assets/photos/2025-05-02-first/05.jpg" },
+        { src: "assets/photos/2025-05-02-first/06.jpg" },
+      ]
+    },
+  
+    // ② 2025-07-02 第二次见面（4张）
+    {
+      group: "2025-07-02 第二次见面",
+      date: "2025-07-02",
+      title: "第二次见面",
+      photos: [
+        { src: "assets/photos/2025-07-02-second/01.jpg" },
+        { src: "assets/photos/2025-07-02-second/02.jpg" },
+        { src: "assets/photos/2025-07-02-second/03.jpg" },
+        { src: "assets/photos/2025-07-02-second/04.jpg" },
+      ]
+    },
+  
+    // ③ 2025-09-19 第三次见面（4张）
+    {
+      group: "2025-09-19 第三次见面",
+      date: "2025-09-19",
+      title: "第三次见面",
+      photos: [
+        { src: "assets/photos/2025-09-19-third/01.jpg" },
+        { src: "assets/photos/2025-09-19-third/02.jpg" },
+        { src: "assets/photos/2025-09-19-third/03.jpg" },
+        { src: "assets/photos/2025-09-19-third/04.jpg" },
+      ]
+    },
+  
+    // ④ 大宝宝的美照（23张，置顶组）
+    {
+      group: "大宝宝的美照",
+      date: "2025-01-01",
+      title: "大宝宝的美照",
+      photos: [
+        { src: "assets/photos/tongtong/01.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/02.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/03.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/04.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/05.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/06.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/07.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/08.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/09.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/10.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/11.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/12.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/13.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/14.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/15.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/16.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/17.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/18.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/19.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/20.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/21.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/22.jpg", tags:["tongtong"] },
+        { src: "assets/photos/tongtong/23.jpg", tags:["tongtong"] },
+      ]
+    },
+  ];
+
 
     // ===== 大图预览：统一索引，支持左右切换/滑动 =====
     const viewerMask = document.getElementById("viewerMask");
@@ -1179,3 +1211,4 @@
   </script>
 </body>
 </html>
+
