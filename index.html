@@ -330,8 +330,6 @@
       font-size: 14px;
       letter-spacing:.2px;
     }
-
-    /* SVG心形 */
     .introHeart{
       width: 138px;
       height: 138px;
@@ -347,37 +345,27 @@
       opacity: .95;
     }
     #heartFill{ fill: var(--accent); }
-
-    /* 仪式感：填满瞬间轻跳一下 */
-    .introHeart.bounce{
-      animation: heartBounce .55s ease both;
-    }
+    .introHeart.bounce{ animation: heartBounce .55s ease both; }
     @keyframes heartBounce{
       0%{ transform: scale(1); }
       30%{ transform: scale(1.12); }
       55%{ transform: scale(0.98); }
       100%{ transform: scale(1.05); }
     }
-
-    /* 仪式感：闪光扫过 */
     .spark{
       position:absolute;
       inset:-40px -80px;
       background: linear-gradient(110deg, transparent 40%, #ffffff30 50%, transparent 60%);
-      transform: translateX(-120%) rotate(0deg);
+      transform: translateX(-120%);
       opacity:0;
       pointer-events:none;
       mix-blend-mode: screen;
     }
-    .spark.play{
-      animation: sparkSweep .7s ease both;
-      opacity:1;
-    }
+    .spark.play{ animation: sparkSweep .7s ease both; opacity:1; }
     @keyframes sparkSweep{
-      0%{ transform: translateX(-120%) }
-      100%{ transform: translateX(120%) }
+      0%{ transform: translateX(-120%); }
+      100%{ transform: translateX(120%); }
     }
-
     .bar{
       margin: 16px auto 8px;
       width: 100%;
@@ -399,13 +387,198 @@
       color: var(--accent2);
       opacity:.95;
     }
-
-    .intro.fadeOut{
-      animation: introFade .55s ease forwards;
-    }
+    .intro.fadeOut{ animation: introFade .55s ease forwards; }
     @keyframes introFade{
       to{ opacity:0; transform: scale(1.01); pointer-events:none; }
     }
+
+    /* ================== 时间线：4组（可折叠 + 单独“美照”组） ================== */
+    .timelinePanel{ margin-top:18px; }
+    .timelineHeaderRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .timelineTools{ display:flex; gap:10px; flex-wrap:wrap; }
+    .toolBtn{
+      border:1px solid #ffffff22;
+      background:#ffffff10;
+      color:#fff;
+      padding:8px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:12px;
+    }
+
+    .group{
+      border:1px solid #ffffff1a;
+      background:#00000018;
+      border-radius:16px;
+      margin-top:12px;
+      overflow:hidden;
+    }
+    .groupHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding: 12px 12px;
+      cursor:pointer;
+      user-select:none;
+      border-bottom:1px solid #ffffff14;
+    }
+    .groupTitle{
+      display:flex;
+      gap:10px;
+      align-items:baseline;
+      flex-wrap:wrap;
+    }
+    .groupTitle b{ color:#fff; }
+    .groupTitle span{ color: var(--muted); font-size:12px; }
+    .chev{ opacity:.9; transition: transform .2s ease; }
+    .group.collapsed .chev{ transform: rotate(-90deg); }
+    .groupBody{
+      padding: 10px 12px 14px;
+      display:block;
+    }
+    .group.collapsed .groupBody{ display:none; }
+
+    .timelineList{
+      position: relative;
+      padding-left: 18px;
+      margin-top: 6px;
+    }
+    .timelineList:before{
+      content:"";
+      position:absolute;
+      left:6px; top:2px; bottom:2px;
+      width:2px;
+      background: linear-gradient(var(--accent), #ffffff00);
+      opacity:.7;
+    }
+    .tItem{
+      position: relative;
+      padding: 12px 12px 14px 14px;
+      margin: 0 0 12px;
+      background:#00000018;
+      border:1px solid #ffffff1a;
+      border-radius: 16px;
+    }
+    .tDot{
+      position:absolute;
+      left:-2px; top:18px;
+      width:14px; height:14px;
+      border-radius:999px;
+      background: var(--accent);
+      box-shadow: 0 0 18px #ff5da2aa;
+      border:2px solid #ffffff30;
+    }
+    .tMeta{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
+    .tDate{ font-weight:800; color:#fff; letter-spacing:.2px; }
+    .tTitle{ color: var(--accent2); font-weight:700; }
+    .tText{
+      margin: 8px 0 10px;
+      color: var(--muted);
+      line-height:1.75;
+      font-size: 14px;
+    }
+
+    .photoGrid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 520px){
+      .photoGrid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    .photo{
+      position:relative;
+      border-radius: 14px;
+      overflow:hidden;
+      border:1px solid #ffffff1a;
+      background:#ffffff0a;
+      cursor:pointer;
+    }
+    .photo img{
+      width:100%;
+      height:120px;
+      object-fit:cover;
+      display:block;
+      transform: scale(1.02);
+      transition: transform .25s ease;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+    .photo:hover img{ transform: scale(1.08); }
+
+    /* 大图预览 + 滑动 */
+    .viewerMask{
+      position:fixed; inset:0;
+      background:#00000085;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 16px;
+      z-index: 999999;
+      touch-action: none;
+    }
+    .viewer{
+      width:min(920px, 96vw);
+      background:#0b1020f2;
+      border:1px solid #ffffff22;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 10px;
+      position:relative;
+      backdrop-filter: blur(12px);
+    }
+    .viewer img{
+      width:100%;
+      height:min(72vh, 680px);
+      object-fit:contain;
+      display:block;
+      border-radius: 14px;
+      background:#00000035;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+    .viewerCap{
+      margin: 8px 6px 2px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.5;
+      text-align:center;
+    }
+    .viewerClose{
+      position:absolute;
+      right:10px; top:10px;
+      width:40px; height:40px;
+      border-radius:12px;
+      border:1px solid #ffffff22;
+      background:#ffffff10;
+      color:#fff;
+      cursor:pointer;
+      font-weight:900;
+    }
+    .viewerNav{
+      position:absolute;
+      top:50%;
+      transform: translateY(-50%);
+      width:42px; height:60px;
+      border-radius: 14px;
+      border:1px solid #ffffff22;
+      background:#ffffff10;
+      color:#fff;
+      cursor:pointer;
+      font-size:30px;
+      line-height: 54px;
+      font-weight:900;
+    }
+    .viewerNav.left{ left:10px; }
+    .viewerNav.right{ right:10px; }
   </style>
 </head>
 
@@ -415,7 +588,6 @@
     <div class="introCard">
       <div class="spark" id="spark" aria-hidden="true"></div>
 
-      <!-- SVG 爱心（填充式） -->
       <svg class="introHeart" id="introHeart" viewBox="0 0 100 100" aria-hidden="true">
         <defs>
           <clipPath id="heartClip">
@@ -449,7 +621,6 @@
 
   <div class="stars"></div>
 
-  <!-- 主内容先隐藏，开场结束后显示 -->
   <div class="wrap" id="main" style="display:none;">
     <div class="card">
       <div class="hint" id="musicHint" title="为了兼容手机浏览器，需要点击一次才可播放">
@@ -488,6 +659,19 @@
               <span>— 送给你（<span id="today2">—</span>）</span>
             </div>
           </div>
+
+          <!-- ✅ 4分组时间线 -->
+          <div class="panel timelinePanel" id="timeline">
+            <div class="timelineHeaderRow">
+              <h2 style="margin:0;">我们的回忆时间线</h2>
+              <div class="timelineTools">
+                <button class="toolBtn" id="expandAll" type="button">全部展开</button>
+                <button class="toolBtn" id="collapseAll" type="button">全部折叠</button>
+              </div>
+            </div>
+            <p class="tiny" style="margin-top:0;">点照片放大；手机在大图上左右滑动切换。</p>
+            <div id="timelineGroups"></div>
+          </div>
         </section>
 
         <aside class="side">
@@ -504,12 +688,11 @@
           <div class="panel">
             <h2>互动一下</h2>
             <div class="btns">
-              <button id="btnHearts">下点爱心雨</button>
-              <button class="ghost" id="btnConfess">我有话想说</button>
-              <button class="ghost" id="btnCopy">复制这封情书</button>
-              <button class="ghost" id="btnMusic">播放/暂停音乐</button>
+              <button id="btnHearts" type="button">下点爱心雨</button>
+              <button class="ghost" id="btnConfess" type="button">我有话想说</button>
+              <button class="ghost" id="btnCopy" type="button">复制这封情书</button>
+              <button class="ghost" id="btnMusic" type="button">播放/暂停音乐</button>
             </div>
-            <p class="tiny"></p>
           </div>
 
           <div class="panel">
@@ -526,8 +709,6 @@
             <audio id="bgm" preload="auto" loop>
               <source src="/Love-Diary/static/bgm.mp3" type="audio/mpeg">
             </audio>
-
-            <p class="tiny" style="opacity:.85"></p>
           </div>
         </aside>
       </div>
@@ -539,19 +720,31 @@
     </div>
   </div>
 
+  <!-- 告白弹窗 -->
   <div class="modalMask" id="mask">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
       <h3 id="mTitle">我想对你说</h3>
       <p id="mText">桐桐，今天不是想煽情，只是想更认真地爱你。</p>
       <div class="row">
-        <button class="ghost" id="mClose">我知道啦</button>
-        <button id="mMore">再说一句</button>
+        <button class="ghost" id="mClose" type="button">我知道啦</button>
+        <button id="mMore" type="button">再说一句</button>
       </div>
     </div>
   </div>
 
+  <!-- 图片预览弹窗 -->
+  <div class="viewerMask" id="viewerMask">
+    <div class="viewer" role="dialog" aria-modal="true">
+      <button class="viewerClose" id="viewerClose" type="button">✕</button>
+      <button class="viewerNav left" id="viewerPrev" type="button">‹</button>
+      <img id="viewerImg" alt="回忆照片" />
+      <button class="viewerNav right" id="viewerNext" type="button">›</button>
+      <div class="viewerCap" id="viewerCap"></div>
+    </div>
+  </div>
+
   <script>
-    // ================== 开场：3秒进度条 + SVG爱心填充 + 仪式感（跳一下+闪光） ==================
+    // ================== 开场 ==================
     const intro = document.getElementById("intro");
     const main = document.getElementById("main");
     const barFill = document.getElementById("barFill");
@@ -560,8 +753,30 @@
     const introHeart = document.getElementById("introHeart");
     const spark = document.getElementById("spark");
     const introText = document.getElementById("introText");
-
     const INTRO_MS = 3000;
+
+    function miniHeartBurst(){
+      const count = 18;
+      for(let i=0;i<count;i++){
+        setTimeout(()=>{
+          const h = document.createElement("div");
+          h.className = "heart";
+          const x = window.innerWidth * (0.5 + (Math.random()*0.22 - 0.11));
+          const dx = (Math.random() * 2 - 1) * 90 + "px";
+          const dur = (Math.random()*0.6 + 1.4).toFixed(2) + "s";
+          const size = (Math.random()*8 + 10).toFixed(0) + "px";
+          const op = (Math.random()*0.25 + 0.55).toFixed(2);
+          h.style.left = x + "px";
+          h.style.setProperty("--dx", dx);
+          h.style.animationDuration = dur;
+          h.style.width = size;
+          h.style.height = size;
+          h.style.opacity = op;
+          document.body.appendChild(h);
+          setTimeout(()=>h.remove(), (parseFloat(dur)+0.2)*1000);
+        }, i*30);
+      }
+    }
 
     function runIntro(){
       const start = performance.now();
@@ -574,67 +789,34 @@
         barFill.style.width = p + "%";
         barNum.textContent = p + "%";
 
-        // SVG 填充：0~100（从下往上）
         const fill = Math.floor(100 * t);
         heartFill.setAttribute("y", String(100 - fill));
         heartFill.setAttribute("height", String(fill));
 
-        // 接近满格时来一点“仪式感”
         if(!celebrated && t >= 0.985){
           celebrated = true;
           introText.textContent = "装好了，送给你。";
           spark.classList.add("play");
           introHeart.classList.add("bounce");
-          // 顺便来一小段爱心雨（开场）
           miniHeartBurst();
         }
 
         if(t < 1){
           requestAnimationFrame(tick);
         }else{
-          // 结束：显示正文、淡出开场
           main.style.display = "";
           intro.classList.add("fadeOut");
           setTimeout(()=> intro.remove(), 650);
         }
       }
-
       requestAnimationFrame(tick);
     }
-
-    // 小小仪式感：开场结束前飘一点点心
-    function miniHeartBurst(){
-      const count = 18;
-      for(let i=0;i<count;i++){
-        setTimeout(()=>{
-          const h = document.createElement("div");
-          h.className = "heart";
-          // 从中间附近随机飘落
-          const x = window.innerWidth * (0.5 + (Math.random()*0.22 - 0.11));
-          const dx = (Math.random() * 2 - 1) * 90 + "px";
-          const dur = (Math.random()*0.6 + 1.4).toFixed(2) + "s";
-          const size = (Math.random()*8 + 10).toFixed(0) + "px";
-          const op = (Math.random()*0.25 + 0.55).toFixed(2);
-
-          h.style.left = x + "px";
-          h.style.setProperty("--dx", dx);
-          h.style.animationDuration = dur;
-          h.style.width = size;
-          h.style.height = size;
-          h.style.opacity = op;
-
-          document.body.appendChild(h);
-          setTimeout(()=>h.remove(), (parseFloat(dur)+0.2)*1000);
-        }, i*30);
-      }
-    }
-
     runIntro();
 
-    // ================== 原有逻辑：信息与日期 ==================
+    // ================== 日期与信息 ==================
     const FROM_NAME = "王强强";
     const TO_NAME = "陈桐桐";
-    const SINCE = "2025-05-02"; // 在一起的日期（YYYY-MM-DD）
+    const SINCE = "2025-05-02";
 
     const FORCE_DAY_COUNT = false;
     const FORCED_DAYS = 229;
@@ -646,8 +828,7 @@
     function daysBetween(a, b){
       const A = new Date(a.getFullYear(), a.getMonth(), a.getDate());
       const B = new Date(b.getFullYear(), b.getMonth(), b.getDate());
-      const ms = B - A;
-      return Math.floor(ms / 86400000) + 1;
+      return Math.floor((B - A) / 86400000) + 1;
     }
     function zhDate(d){
       return d.toLocaleDateString("zh-CN", {year:"numeric", month:"long", day:"numeric"});
@@ -695,7 +876,7 @@
       for(let i=0;i<n;i++) setTimeout(spawnHeart, i*38);
     });
 
-    // ================== 弹窗告白 ==================
+    // ================== 告白弹窗 ==================
     const mask = document.getElementById("mask");
     const mText = document.getElementById("mText");
     const lines = [
@@ -747,7 +928,7 @@
       }
     });
 
-    // ================== 背景音乐（移动端更稳：第一次交互后播放） ==================
+    // ================== 音乐 ==================
     const bgm = document.getElementById("bgm");
     const hint = document.getElementById("musicHint");
     let unlocked = false;
@@ -757,27 +938,244 @@
         await bgm.play();
         hint.style.display = "none";
         unlocked = true;
-      }catch(e){
-        // 被浏览器策略拦截时，保持提示
-      }
+      }catch(e){}
     }
-
-    window.addEventListener("click", ()=>{
-      if(!unlocked) tryPlay();
-    }, { once:false, passive:true });
-
+    window.addEventListener("click", ()=>{ if(!unlocked) tryPlay(); }, { passive:true });
     document.getElementById("btnMusic").addEventListener("click", async ()=>{
-      if(bgm.paused){
-        await tryPlay();
-      }else{
+      if(bgm.paused) await tryPlay();
+      else{
         bgm.pause();
         hint.style.display = "flex";
         hint.innerHTML = "🎵 <b>已暂停</b> 再点播放";
       }
     });
-
-    // 桌面端可能直接成功；移动端大概率需要点击一次
     tryPlay();
+
+    // ================== 时间线：仅4组（按你需求） ==================
+    // 你只要把图片放到对应文件夹，并保证文件名一致即可
+    const TIMELINE = [
+      {
+        group: "2025-05-02 第一次见面",
+        date: "2025-05-02",
+        title: "第一次见面",
+        text: "那天开始，我就想更靠近你一点。",
+        photos: [
+          { src: "assets/photos/2025-05-02-first/01.jpg", cap: "第一次见面 01" },
+          { src: "assets/photos/2025-05-02-first/02.jpg", cap: "第一次见面 02" },
+        ]
+      },
+      {
+        group: "2025-07-02 第二次见面",
+        date: "2025-07-02",
+        title: "第二次见面",
+        text: "第二次见面，比第一次还心动。",
+        photos: [
+          { src: "assets/photos/2025-07-02-second/01.jpg", cap: "第二次见面 01" },
+          { src: "assets/photos/2025-07-02-second/02.jpg", cap: "第二次见面 02" },
+        ]
+      },
+      {
+        group: "2025-09-19 第三次见面",
+        date: "2025-09-19",
+        title: "第三次见面",
+        text: "越见越喜欢，越喜欢越坚定。",
+        photos: [
+          { src: "assets/photos/2025-09-19-third/01.jpg", cap: "第三次见面 01" },
+          { src: "assets/photos/2025-09-19-third/02.jpg", cap: "第三次见面 02" },
+        ]
+      },
+      {
+        group: "大宝宝的美照",
+        date: "2025-01-01",
+        title: "大宝宝的美照",
+        text: "只要你一笑，我就觉得今天特别好。",
+        photos: [
+          { src: "assets/photos/tongtong/01.jpg", cap: "大宝宝 01", tags:["tongtong"] },
+          { src: "assets/photos/tongtong/02.jpg", cap: "大宝宝 02", tags:["tongtong"] },
+          { src: "assets/photos/tongtong/03.jpg", cap: "大宝宝 03", tags:["tongtong"] },
+        ]
+      },
+    ];
+
+    // ===== 大图预览：统一索引，支持左右切换/滑动 =====
+    const viewerMask = document.getElementById("viewerMask");
+    const viewerImg = document.getElementById("viewerImg");
+    const viewerCap = document.getElementById("viewerCap");
+    const viewerClose = document.getElementById("viewerClose");
+    const viewerPrev = document.getElementById("viewerPrev");
+    const viewerNext = document.getElementById("viewerNext");
+
+    const flatPhotos = [];
+    TIMELINE.forEach((it, entryIdx)=>{
+      (it.photos||[]).forEach((p, photoIdx)=>{
+        flatPhotos.push({ entryIdx, photoIdx });
+      });
+    });
+    let curFlat = 0;
+
+    function setViewerByFlat(i){
+      curFlat = (i + flatPhotos.length) % flatPhotos.length;
+      const ref = flatPhotos[curFlat];
+      const item = TIMELINE[ref.entryIdx];
+      const photo = item.photos[ref.photoIdx];
+      viewerImg.src = photo.src;
+      viewerCap.textContent = `${item.group}${photo.cap ? " · " + photo.cap : ""}`;
+      viewerMask.style.display = "flex";
+    }
+    function closeViewer(){
+      viewerMask.style.display = "none";
+      viewerImg.src = "";
+    }
+    function step(dir){ setViewerByFlat(curFlat + dir); }
+
+    viewerClose.addEventListener("click", closeViewer);
+    viewerMask.addEventListener("click", (e)=>{ if(e.target === viewerMask) closeViewer(); });
+    viewerPrev.addEventListener("click", ()=> step(-1));
+    viewerNext.addEventListener("click", ()=> step(1));
+    window.addEventListener("keydown", (e)=>{
+      if(viewerMask.style.display !== "flex") return;
+      if(e.key === "Escape") closeViewer();
+      if(e.key === "ArrowLeft") step(-1);
+      if(e.key === "ArrowRight") step(1);
+    });
+
+    // 手机滑动
+    let touchX0 = null, touchY0 = null;
+    viewerImg.addEventListener("touchstart", (e)=>{
+      const t = e.touches[0];
+      touchX0 = t.clientX;
+      touchY0 = t.clientY;
+    }, {passive:true});
+    viewerImg.addEventListener("touchend", (e)=>{
+      if(touchX0 == null || touchY0 == null) return;
+      const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : null;
+      if(!t) return;
+      const dx = t.clientX - touchX0;
+      const dy = t.clientY - touchY0;
+      touchX0 = null; touchY0 = null;
+      if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)){
+        if(dx < 0) step(1);
+        else step(-1);
+      }
+    }, {passive:true});
+
+    // ===== 渲染 4 分组 + 折叠 =====
+    const groupsRoot = document.getElementById("timelineGroups");
+    const expandAllBtn = document.getElementById("expandAll");
+    const collapseAllBtn = document.getElementById("collapseAll");
+
+    function findFlatIndex(entryIdx, photoIdx){
+      for(let i=0;i<flatPhotos.length;i++){
+        const r = flatPhotos[i];
+        if(r.entryIdx === entryIdx && r.photoIdx === photoIdx) return i;
+      }
+      return 0;
+    }
+
+    function renderGroup(groupName, entries){
+      const totalPhotos = entries.reduce((a,it)=> a + (it.photos?.length||0), 0);
+
+      const bodyHtml = groupName === "大宝宝的美照"
+        ? `
+          <div class="photoGrid">
+            ${entries.flatMap((it, entryIdxGlobal)=>{
+              const eIdx = TIMELINE.indexOf(it);
+              return (it.photos||[]).map((p, photoIdx)=> {
+                const flat = findFlatIndex(eIdx, photoIdx);
+                return `<div class="photo" data-flat="${flat}">
+                          <img src="${p.src}" alt="${p.cap || "桐桐"}" loading="lazy">
+                        </div>`;
+              });
+            }).join("")}
+          </div>
+        `
+        : `
+          <div class="timelineList">
+            ${entries.map(it=>{
+              const eIdx = TIMELINE.indexOf(it);
+              const photos = (it.photos||[]).map((p, photoIdx)=>{
+                const flat = findFlatIndex(eIdx, photoIdx);
+                return `<div class="photo" data-flat="${flat}">
+                          <img src="${p.src}" alt="${p.cap || "回忆照片"}" loading="lazy">
+                        </div>`;
+              }).join("");
+
+              return `
+                <div class="tItem">
+                  <div class="tDot"></div>
+                  <div class="tMeta">
+                    <div class="tDate">${it.date}</div>
+                    <div class="tTitle">${it.title}</div>
+                  </div>
+                  ${it.text ? `<div class="tText">${it.text}</div>` : ``}
+                  <div class="photoGrid">${photos}</div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+
+      return `
+        <div class="group" data-group="${groupName}">
+          <div class="groupHead">
+            <div class="groupTitle">
+              <b>${groupName}</b>
+              <span>${entries.length} 条 · ${totalPhotos} 张</span>
+            </div>
+            <div class="chev">▾</div>
+          </div>
+          <div class="groupBody">
+            ${bodyHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTimeline(){
+      // 固定顺序：美照置顶，其余按你给的时间顺序
+      const groups = [
+        "大宝宝的美照",
+        "2025-05-02 第一次见面",
+        "2025-07-02 第二次见面",
+        "2025-09-19 第三次见面",
+      ];
+
+      const map = new Map();
+      groups.forEach(g=> map.set(g, []));
+      TIMELINE.forEach(it=>{
+        if(map.has(it.group)) map.get(it.group).push(it);
+      });
+
+      const html = groups.map(g=> renderGroup(g, map.get(g))).join("");
+      groupsRoot.innerHTML = html;
+
+      // 默认：只展开前2组（你可改）
+      const els = Array.from(groupsRoot.querySelectorAll(".group"));
+      els.forEach((g, idx)=>{
+        if(idx >= 2) g.classList.add("collapsed");
+      });
+    }
+    renderTimeline();
+
+    groupsRoot.addEventListener("click", (e)=>{
+      const head = e.target.closest(".groupHead");
+      if(head){
+        head.closest(".group").classList.toggle("collapsed");
+        return;
+      }
+      const ph = e.target.closest(".photo");
+      if(ph){
+        const flat = Number(ph.dataset.flat || 0);
+        setViewerByFlat(flat);
+      }
+    });
+
+    expandAllBtn.addEventListener("click", ()=>{
+      groupsRoot.querySelectorAll(".group").forEach(g=> g.classList.remove("collapsed"));
+    });
+    collapseAllBtn.addEventListener("click", ()=>{
+      groupsRoot.querySelectorAll(".group").forEach(g=> g.classList.add("collapsed"));
+    });
   </script>
 </body>
 </html>
