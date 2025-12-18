@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>给陈桐桐的一封情书</title>
   <meta name="description" content="王强强写给陈桐桐的小惊喜：一封会下爱心雨的情书" />
+
   <style>
     :root{
       --bg1:#0b1020;
@@ -16,7 +17,13 @@
       --accent2:#ffd6e7;
       --shadow: 0 18px 50px #00000055;
       --radius: 18px;
+
+      /* 星空漂移速度（音乐联动会覆盖） */
+      --starDrift1: 40s;
+      --starDrift2: 65s;
+      --starDrift3: 90s;
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -28,6 +35,67 @@
         radial-gradient(900px 600px at 80% 30%, #7c3aed25, transparent 55%),
         linear-gradient(140deg, var(--bg1), var(--bg2));
       overflow-x:hidden;
+      transition: filter .3s ease;
+    }
+
+    /* ✅ 音乐联动：播放时更甜、更“活” */
+    body.musicOn{
+      --accent:#ff3d96;
+      --accent2:#ffe3f0;
+      --starDrift1: 26s;
+      --starDrift2: 44s;
+      --starDrift3: 62s;
+      filter: saturate(1.06);
+    }
+
+    /* ================== 背景：飘动照片（你上传的照片） ================== */
+    .floatBg{
+      position:fixed;
+      inset:0;
+      z-index: 0;
+      pointer-events:none;
+      overflow:hidden;
+      opacity:.40;
+      filter: saturate(1.06) contrast(1.02);
+    }
+    .floatPic{
+      position:absolute;
+      width: 160px;
+      height: 220px;
+      border-radius: 18px;
+      overflow:hidden;
+      border:1px solid #ffffff24;
+      background:#ffffff10;
+      box-shadow: 0 18px 60px #00000040;
+      transform: translate3d(0,0,0);
+      backdrop-filter: blur(2px);
+      will-change: transform, opacity;
+    }
+    .floatPic img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+    .floatPic:after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(260px 160px at 20% 10%, #ffffff22, transparent 60%);
+      mix-blend-mode: screen;
+      opacity:.85;
+    }
+    @keyframes floatUp{
+      from{
+        transform: translate3d(var(--x), 110vh, 0) rotate(var(--r));
+        opacity:0;
+      }
+      10%{ opacity: var(--op); }
+      to{
+        transform: translate3d(calc(var(--x) + var(--dx)), -30vh, 0) rotate(calc(var(--r) + 12deg));
+        opacity:0;
+      }
     }
 
     /* 背景星点 */
@@ -39,26 +107,27 @@
       opacity:.35;
       pointer-events:none;
       mix-blend-mode: screen;
+      z-index: 1;
     }
     .stars{
       background-image:
         radial-gradient(#ffffff55 1px, transparent 1px),
         radial-gradient(#ffffff33 1px, transparent 1px);
       background-position: 0 0, 80px 120px;
-      animation: drift 40s linear infinite;
+      animation: drift var(--starDrift1) linear infinite;
     }
     .stars:before{
       background-image: radial-gradient(#ffffff33 1px, transparent 1px);
       background-size: 260px 260px;
       background-position: 50px 70px;
-      animation: drift 65s linear infinite reverse;
+      animation: drift var(--starDrift2) linear infinite reverse;
       opacity:.25;
     }
     .stars:after{
       background-image: radial-gradient(#ff5da255 1px, transparent 1px);
       background-size: 320px 320px;
       background-position: 140px 30px;
-      animation: drift 90s linear infinite;
+      animation: drift var(--starDrift3) linear infinite;
       opacity:.18;
     }
     @keyframes drift{
@@ -72,6 +141,8 @@
       align-items:center;
       justify-content:center;
       padding:28px 16px 90px;
+      position:relative;
+      z-index: 2;
     }
 
     .card{
@@ -82,6 +153,7 @@
       box-shadow: var(--shadow);
       overflow:hidden;
       position:relative;
+      z-index: 2;
       backdrop-filter: blur(10px);
     }
 
@@ -94,7 +166,7 @@
       font-size:14px;
     }
     .dot{
-      width:10px;height:10px;border-radius:999px;background:#ff5da2;
+      width:10px;height:10px;border-radius:999px;background:var(--accent);
       box-shadow: 0 0 18px #ff5da2aa;
     }
     .dot:nth-child(2){background:#ffd166; box-shadow:0 0 18px #ffd166aa}
@@ -296,7 +368,7 @@
       border-radius:999px;
       backdrop-filter: blur(10px);
       display:flex; gap:8px; align-items:center;
-      z-index: 2;
+      z-index: 3;
     }
     .hint b{color:var(--accent2)}
 
@@ -446,6 +518,15 @@
     }
     .group.collapsed .groupBody{ display:none; }
 
+    /* ✅ 展开动画：JS 展开时短暂加 opening */
+    .group.opening .groupBody{
+      animation: fadeUp .35s ease both;
+    }
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform:none; }
+    }
+
     .timelineList{
       position: relative;
       padding-left: 18px;
@@ -528,6 +609,11 @@
       padding: 10px;
       position:relative;
       backdrop-filter: blur(12px);
+      animation: viewerIn .18s ease both;
+    }
+    @keyframes viewerIn{
+      from{ opacity:0; transform: scale(.98); }
+      to{ opacity:1; transform:none; }
     }
     .viewer img{
       width:100%;
@@ -573,10 +659,41 @@
     }
     .viewerNav.left{ left:10px; }
     .viewerNav.right{ right:10px; }
+
+    /* 音乐进度条样式（更有质感一点） */
+    input[type="range"]{
+      -webkit-appearance:none;
+      appearance:none;
+      height: 6px;
+      border-radius:999px;
+      background:#ffffff22;
+      outline:none;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:16px;height:16px;
+      border-radius:999px;
+      background: linear-gradient(90deg, var(--accent), #ffb4d6);
+      border:1px solid #ffffff30;
+      box-shadow: 0 10px 25px #ff5da240;
+      cursor:pointer;
+    }
+    input[type="range"]::-moz-range-thumb{
+      width:16px;height:16px;
+      border-radius:999px;
+      background: linear-gradient(90deg, var(--accent), #ffb4d6);
+      border:1px solid #ffffff30;
+      box-shadow: 0 10px 25px #ff5da240;
+      cursor:pointer;
+    }
   </style>
 </head>
 
 <body>
+  <!-- ✅ 背景飘动照片层（每次打开随机抽12张使用） -->
+  <div class="floatBg" id="floatBg" aria-hidden="true"></div>
+
   <!-- 开场动画层 -->
   <div id="intro" class="intro">
     <div class="introCard">
@@ -654,7 +771,7 @@
             </div>
           </div>
 
-          <!-- ✅ 4分组时间线 -->
+          <!-- 时间线 -->
           <div class="panel timelinePanel" id="timeline">
             <div class="timelineHeaderRow">
               <h2 style="margin:0;">我们的回忆时间线</h2>
@@ -663,7 +780,9 @@
                 <button class="toolBtn" id="collapseAll" type="button">全部折叠</button>
               </div>
             </div>
-            <p class="tiny" style="margin-top:0;">点组名展开加载图片；点照片放大；手机在大图上左右滑动切换。</p>
+            <p class="tiny" style="margin-top:0;">
+              点组名展开（只加载这一组图片）；再次点可折叠。点照片放大；手机在大图上左右滑动切换。
+            </p>
             <div id="timelineGroups"></div>
           </div>
         </section>
@@ -685,31 +804,37 @@
               <button id="btnHearts" type="button">下点爱心雨</button>
               <button class="ghost" id="btnConfess" type="button">我有话想说</button>
               <button class="ghost" id="btnCopy" type="button">复制这封情书</button>
-              <button class="ghost" id="btnMusic" type="button">播放/暂停音乐</button>
+              <button class="ghost" id="btnMusic" type="button">播放</button>
+              <button class="ghost" id="btnNext" type="button">下一曲</button>
             </div>
           </div>
 
           <div class="panel">
-            <h2>背景音乐（小狗）</h2>
-            <p class="tiny">
-              我选了这首歌当背景音乐，<br/>
-              因为每次听到它，都会想到你。
-            </p>
+            <h2>背景音乐（bgm1~bgm6）</h2>
             <p class="tiny" style="opacity:.85">
-              如果它没有马上播放，<br/>
-              轻轻点一下页面，让我陪你久一点。
+              手机浏览器通常需要点一下页面才能播放；<br/>
+              进度条可以拖动，下一曲会自动续上氛围。
             </p>
 
-            <audio id="bgm" preload="auto" loop>
-              <source src="/Love-Diary/static/bgm.mp3" type="audio/mpeg">
-            </audio>
+            <!-- ✅ 用 JS 控制 src（便于切歌） -->
+            <audio id="bgm" preload="auto"></audio>
+
+            <!-- ✅ 可拖动进度条 -->
+            <div style="margin-top:10px;">
+              <input id="seek" type="range" min="0" max="1000" value="0" style="width:100%;">
+              <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:6px;">
+                <span id="curTime">0:00</span>
+                <span id="trackName">bgm1</span>
+                <span id="durTime">0:00</span>
+              </div>
+            </div>
           </div>
         </aside>
       </div>
 
       <div class="footer">
         <span>Made with ❤ by 王强强</span>
-        <span> </span>
+        <span></span>
       </div>
     </div>
   </div>
@@ -772,41 +897,6 @@
       }
     }
 
-    function runIntro(){
-      const start = performance.now();
-      let celebrated = false;
-
-      function tick(now){
-        const t = Math.min(1, (now - start) / INTRO_MS);
-        const p = Math.floor(t * 100);
-
-        barFill.style.width = p + "%";
-        barNum.textContent = p + "%";
-
-        const fill = Math.floor(100 * t);
-        heartFill.setAttribute("y", String(100 - fill));
-        heartFill.setAttribute("height", String(fill));
-
-        if(!celebrated && t >= 0.985){
-          celebrated = true;
-          introText.textContent = "装好了，送给你。";
-          spark.classList.add("play");
-          introHeart.classList.add("bounce");
-          miniHeartBurst();
-        }
-
-        if(t < 1){
-          requestAnimationFrame(tick);
-        }else{
-          main.style.display = "";
-          intro.classList.add("fadeOut");
-          setTimeout(()=> intro.remove(), 650);
-        }
-      }
-      requestAnimationFrame(tick);
-    }
-    runIntro();
-
     // ================== 日期与信息 ==================
     const FROM_NAME = "王强强";
     const TO_NAME = "陈桐桐";
@@ -827,6 +917,7 @@
     function zhDate(d){
       return d.toLocaleDateString("zh-CN", {year:"numeric", month:"long", day:"numeric"});
     }
+    function mdKey(d){ return `${d.getMonth()+1}-${d.getDate()}`; }
 
     document.getElementById("fromName").textContent = FROM_NAME;
     document.getElementById("toName").textContent = TO_NAME;
@@ -844,6 +935,26 @@
     const dayCount = FORCE_DAY_COUNT ? FORCED_DAYS : computed;
     document.getElementById("dayCount").textContent = dayCount;
     document.getElementById("dayCount2").textContent = dayCount;
+
+    // ================== 纪念日彩蛋 ==================
+    const special = (function(){
+      const todayMD = mdKey(today);
+      const sinceMD = mdKey(sinceDate);
+      const MAP = {
+        "5-2":  { title:"今天很特别", text:"今天是我们故事里很重要的一天。" },
+        "7-2":  { title:"今天很特别", text:"想起那次见面，心还是会轻轻一跳。" },
+        "9-19": { title:"今天很特别", text:"那一天的我们，真的很美好。" },
+      };
+      if(todayMD === sinceMD){
+        return { hit:true, title:"纪念日快乐", text:"今天是我们的纪念日。谢谢你，出现在我的生活里。" };
+      }
+      if(MAP[todayMD]) return { hit:true, ...MAP[todayMD] };
+      return { hit:false, title:"", text:"" };
+    })();
+
+    if(special.hit){
+      introText.textContent = "正在准备一份特别的心意…";
+    }
 
     // ================== 爱心雨 ==================
     function spawnHeart(){
@@ -865,14 +976,16 @@
       document.body.appendChild(h);
       setTimeout(()=>h.remove(), (parseFloat(dur)+0.2)*1000);
     }
-    document.getElementById("btnHearts").addEventListener("click", ()=>{
-      const n = 60;
-      for(let i=0;i<n;i++) setTimeout(spawnHeart, i*38);
-    });
+    function rainHearts(n=60, gap=38){
+      for(let i=0;i<n;i++) setTimeout(spawnHeart, i*gap);
+    }
+    document.getElementById("btnHearts").addEventListener("click", ()=> rainHearts(60, 38));
 
     // ================== 告白弹窗 ==================
     const mask = document.getElementById("mask");
     const mText = document.getElementById("mText");
+    const mTitle = document.getElementById("mTitle");
+
     const lines = [
       "我喜欢你，是那种想认真走到最后的喜欢。",
       "你开心的时候，我想和你一起笑；你难过的时候，我想第一个抱住你。",
@@ -885,6 +998,7 @@
     document.getElementById("btnConfess").addEventListener("click", ()=>{
       mask.style.display = "flex";
       idx = 0;
+      mTitle.textContent = "我想对你说";
       mText.textContent = "桐桐，今天不是想煽情，只是想更认真地爱你。";
     });
     document.getElementById("mClose").addEventListener("click", ()=>{ mask.style.display = "none"; });
@@ -922,28 +1036,176 @@
       }
     });
 
-    // ================== 音乐（优先加载：先缓冲，第一次交互优先播放） ==================
+    // ================== 彩蛋：开场后触发 ==================
+    function handleSpecialDayAfterIntro(){
+      if(!special.hit) return;
+      rainHearts(46, 28);
+      setTimeout(()=>{
+        mTitle.textContent = special.title;
+        mText.textContent = special.text;
+        mask.style.display = "flex";
+      }, 680);
+    }
+
+    // ================== 开场主流程 ==================
+    function runIntro(){
+      const start = performance.now();
+      let celebrated = false;
+
+      function tick(now){
+        const t = Math.min(1, (now - start) / INTRO_MS);
+        const p = Math.floor(t * 100);
+
+        barFill.style.width = p + "%";
+        barNum.textContent = p + "%";
+
+        const fill = Math.floor(100 * t);
+        heartFill.setAttribute("y", String(100 - fill));
+        heartFill.setAttribute("height", String(fill));
+
+        if(!celebrated && t >= 0.985){
+          celebrated = true;
+          introText.textContent = special.hit ? "今天有一点特别…" : "装好了，送给你。";
+          spark.classList.add("play");
+          introHeart.classList.add("bounce");
+          miniHeartBurst();
+        }
+
+        if(t < 1){
+          requestAnimationFrame(tick);
+        }else{
+          main.style.display = "";
+          intro.classList.add("fadeOut");
+          setTimeout(()=> intro.remove(), 650);
+          setTimeout(()=> handleSpecialDayAfterIntro(), 420);
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // ================== 音乐：6首歌 + 下一曲 + 拖动进度条 ==================
     const bgm = document.getElementById("bgm");
     const hint = document.getElementById("musicHint");
-    let unlocked = false;
+    const btnMusic = document.getElementById("btnMusic");
+    const btnNext  = document.getElementById("btnNext");
+    const seek = document.getElementById("seek");
+    const curTimeEl = document.getElementById("curTime");
+    const durTimeEl = document.getElementById("durTime");
+    const trackNameEl = document.getElementById("trackName");
 
-    // ✅ 优先预加载
-    try{
+    const PLAYLIST = [
+      { name: "bgm1", src: "/Love-Diary/static/bgm/bgm1.mp3" },
+      { name: "bgm2", src: "/Love-Diary/static/bgm/bgm2.mp3" },
+      { name: "bgm3", src: "/Love-Diary/static/bgm/bgm3.mp3" },
+      { name: "bgm4", src: "/Love-Diary/static/bgm/bgm4.mp3" },
+      { name: "bgm5", src: "/Love-Diary/static/bgm/bgm5.mp3" },
+      { name: "bgm6", src: "/Love-Diary/static/bgm/bgm6.mp3" },
+    ];
+
+    let trackIndex = 0;
+    let unlocked = false;
+    let isSeeking = false;
+
+    function fmt(t){
+      if(!isFinite(t) || t < 0) return "0:00";
+      const m = Math.floor(t/60);
+      const s = Math.floor(t%60);
+      return `${m}:${String(s).padStart(2,"0")}`;
+    }
+
+    function setMusicUI(isOn){
+      document.body.classList.toggle("musicOn", isOn);
+      if(isOn){
+        hint.style.display = "none";
+      }else{
+        hint.style.display = "flex";
+        hint.innerHTML = "🎵 <b>点一下</b> 开启我们的歌";
+      }
+    }
+
+    function loadTrack(i, autoPlay=false){
+      trackIndex = (i + PLAYLIST.length) % PLAYLIST.length;
+      const t = PLAYLIST[trackIndex];
+
+      bgm.src = t.src;
+      bgm.loop = false;        // ✅ 整套歌单循环（不单曲 loop）
       bgm.preload = "auto";
-      bgm.load();
-    }catch(e){}
+      try{ bgm.load(); }catch(e){}
+
+      trackNameEl.textContent = t.name;
+      seek.value = 0;
+      curTimeEl.textContent = "0:00";
+      durTimeEl.textContent = "0:00";
+
+      if(autoPlay) tryPlay();
+    }
 
     async function tryPlay(){
       try{
         await bgm.play();
-        hint.style.display = "none";
         unlocked = true;
+        setMusicUI(true);
+        btnMusic.textContent = "暂停";
       }catch(e){
-        // 手机策略拦截：需要用户交互
+        // 手机策略：需要用户手势
       }
     }
 
-    // ✅ 第一次用户交互：优先尝试播放音乐
+    function togglePlay(){
+      if(bgm.paused) tryPlay();
+      else{
+        bgm.pause();
+        setMusicUI(false);
+        btnMusic.textContent = "播放";
+      }
+    }
+
+    function nextTrack(autoPlay=true){
+      loadTrack(trackIndex + 1, autoPlay);
+    }
+
+    // 播放/暂停联动
+    bgm.addEventListener("play", ()=> setMusicUI(true));
+    bgm.addEventListener("pause", ()=> setMusicUI(false));
+
+    // 单曲结束 -> 下一首
+    bgm.addEventListener("ended", ()=> nextTrack(true));
+
+    // 元数据
+    bgm.addEventListener("loadedmetadata", ()=>{
+      durTimeEl.textContent = fmt(bgm.duration);
+    });
+
+    // 进度刷新
+    bgm.addEventListener("timeupdate", ()=>{
+      if(isSeeking) return;
+      curTimeEl.textContent = fmt(bgm.currentTime);
+      if(isFinite(bgm.duration) && bgm.duration > 0){
+        const v = Math.floor((bgm.currentTime / bgm.duration) * 1000);
+        seek.value = String(v);
+      }
+    });
+
+    // 拖动进度条
+    seek.addEventListener("input", ()=>{
+      isSeeking = true;
+      if(isFinite(bgm.duration) && bgm.duration > 0){
+        const target = (Number(seek.value)/1000) * bgm.duration;
+        curTimeEl.textContent = fmt(target);
+      }
+    });
+    seek.addEventListener("change", ()=>{
+      if(isFinite(bgm.duration) && bgm.duration > 0){
+        const target = (Number(seek.value)/1000) * bgm.duration;
+        bgm.currentTime = target;
+      }
+      isSeeking = false;
+    });
+
+    btnMusic.addEventListener("click", togglePlay);
+    btnNext.addEventListener("click", ()=> nextTrack(!bgm.paused));
+
+    // ✅ 首次交互：优先解锁音乐
     function firstGesture(){
       if(!unlocked) tryPlay();
       window.removeEventListener("pointerdown", firstGesture);
@@ -954,17 +1216,101 @@
     window.addEventListener("touchstart", firstGesture, {passive:true});
     window.addEventListener("click", firstGesture, {passive:true});
 
-    document.getElementById("btnMusic").addEventListener("click", async ()=>{
-      if(bgm.paused){
-        await tryPlay();
-      }else{
-        bgm.pause();
-        hint.style.display = "flex";
-        hint.innerHTML = "🎵 <b>已暂停</b> 再点播放";
-      }
-    });
+    // 初始化第一首
+    loadTrack(0, false);
 
-    // ================== 时间线：按组懒加载（不自动展开） ==================
+    // ================== 背景飘动照片：每次打开随机抽12张 ==================
+    const floatBg = document.getElementById("floatBg");
+
+    // ✅ 你把参与“背景飘动”的照片都填到这里（越多越随机）
+    //    路径示例：assets/floating/01.jpg
+    const FLOAT_MANIFEST = [
+      "assets/photos/tongtong/01.jpg",
+      "assets/photos/tongtong/02.jpg",
+      "assets/photos/tongtong/03.jpg",
+      "assets/photos/tongtong/04.jpg",
+      "assets/photos/tongtong/05.jpg",
+      "assets/photos/tongtong/06.jpg",
+      "assets/photos/tongtong/07.jpg",
+      "assets/photos/tongtong/08.jpg",
+      "assets/photos/tongtong/09.jpg",
+      "assets/photos/tongtong/10.jpg",
+      "assets/photos/tongtong/11.jpg",
+      "assets/photos/tongtong/12.jpg",
+      "assets/photos/tongtong/13.jpg",
+      "assets/photos/tongtong/14.jpg",
+      "assets/photos/tongtong/15.jpg",
+      "assets/photos/tongtong/16.jpg",
+      "assets/photos/tongtong/17.jpg",
+      "assets/photos/tongtong/18.jpg",
+      "assets/photos/tongtong/19.jpg",
+      "assets/photos/tongtong/20.jpg",
+      "assets/photos/tongtong/21.jpg",
+      "assets/photos/tongtong/22.jpg",
+      "assets/photos/tongtong/23.jpg",
+      // "assets/floating/14.jpg",
+    ];
+
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // 每次打开页面，随机抽 12 张作为本次背景池
+    const FLOAT_POOL = shuffle(FLOAT_MANIFEST).slice(0, Math.min(12, FLOAT_MANIFEST.length));
+
+    function spawnFloatPic(){
+      if(!floatBg || FLOAT_POOL.length === 0) return;
+
+      const wrap = document.createElement("div");
+      wrap.className = "floatPic";
+
+      const img = document.createElement("img");
+      const src = FLOAT_POOL[Math.floor(Math.random()*FLOAT_POOL.length)];
+      img.src = src;
+      wrap.appendChild(img);
+
+      // 动画参数（更柔和一点）
+      const x = Math.random()*100;                 // vw
+      const dx = (Math.random()*2 - 1) * 18;       // vw
+      const r = (Math.random()*2 - 1) * 8;         // deg
+      const op = (Math.random()*0.18 + 0.18).toFixed(2);
+      const dur = (Math.random()*10 + 18).toFixed(2);
+      const sizeW = Math.floor(Math.random()*60 + 130);
+      const sizeH = Math.floor(sizeW * (Math.random()*0.35 + 1.25));
+
+      wrap.style.setProperty("--x", x + "vw");
+      wrap.style.setProperty("--dx", dx + "vw");
+      wrap.style.setProperty("--r", r + "deg");
+      wrap.style.setProperty("--op", op);
+
+      wrap.style.width = sizeW + "px";
+      wrap.style.height = sizeH + "px";
+      wrap.style.left = "0";
+      wrap.style.top = "0";
+      wrap.style.animation = `floatUp ${dur}s linear forwards`;
+
+      floatBg.appendChild(wrap);
+      setTimeout(()=> wrap.remove(), (Number(dur)+1)*1000);
+    }
+
+    let floatTimer = null;
+    function startFloating(){
+      if(floatTimer) return;
+      for(let i=0;i<6;i++) setTimeout(spawnFloatPic, i*220);
+      floatTimer = setInterval(spawnFloatPic, 900);
+    }
+    // 你想一直飘：直接启动
+    startFloating();
+
+    // （可选）如果你想“只有音乐播放时才飘”，把上面的 startFloating() 删掉，改成：
+    // bgm.addEventListener("play", ()=> startFloating());
+
+    // ================== 时间线：按组懒加载（展开才加载） ==================
     const TIMELINE = [
       {
         group: "2025-05-02 第一次见面",
@@ -973,6 +1319,7 @@
         photos: [
           { src: "assets/photos/2025-05-02-first/01.jpg" },
           { src: "assets/photos/2025-05-02-first/02.jpg" },
+          { src: "assets/photos/2025-05-02-first/03.jpg" },
           { src: "assets/photos/2025-05-02-first/04.jpg" },
           { src: "assets/photos/2025-05-02-first/05.jpg" },
           { src: "assets/photos/2025-05-02-first/06.jpg" },
@@ -1040,7 +1387,6 @@
     const viewerPrev = document.getElementById("viewerPrev");
     const viewerNext = document.getElementById("viewerNext");
 
-    // 用 data-src 懒加载后，flat 仍然用 TIMELINE 的 photo.src 来展示大图
     const flatPhotos = [];
     TIMELINE.forEach((it, entryIdx)=>{
       (it.photos||[]).forEach((p, photoIdx)=>{
@@ -1095,7 +1441,7 @@
       }
     }, {passive:true});
 
-    // ===== 按组懒加载工具函数 =====
+    // ===== 按组懒加载 =====
     function loadImagesIn(el){
       const imgs = el.querySelectorAll('img[data-src]:not([src])');
       imgs.forEach(img => { img.src = img.dataset.src; });
@@ -1105,7 +1451,7 @@
       if(body) loadImagesIn(body);
     }
 
-    // ===== 渲染 4 分组 + 折叠（默认全部折叠，不自动展开） =====
+    // ===== 渲染分组 =====
     const groupsRoot = document.getElementById("timelineGroups");
     const expandAllBtn = document.getElementById("expandAll");
     const collapseAllBtn = document.getElementById("collapseAll");
@@ -1190,47 +1536,62 @@
         if(map.has(it.group)) map.get(it.group).push(it);
       });
 
-      const html = groups.map(g=> renderGroup(g, map.get(g))).join("");
-      groupsRoot.innerHTML = html;
-
-      // ✅ 默认全部折叠：不自动展开，也不会加载任何图片
+      groupsRoot.innerHTML = groups.map(g=> renderGroup(g, map.get(g))).join("");
       groupsRoot.querySelectorAll(".group").forEach(g=> g.classList.add("collapsed"));
     }
     renderTimeline();
 
-    // 点击：展开时加载该组图片；点缩略图会先加载所属组
+    // ✅ 手风琴：一次只展开一组 + 展开动画 + 懒加载该组
+    function openGroup(groupEl){
+      groupsRoot.querySelectorAll(".group").forEach(g=>{
+        if(g !== groupEl) g.classList.add("collapsed");
+      });
+
+      groupEl.classList.remove("collapsed");
+      groupEl.classList.remove("opening");
+      void groupEl.offsetWidth;
+      groupEl.classList.add("opening");
+      setTimeout(()=> groupEl.classList.remove("opening"), 420);
+
+      loadImagesForGroup(groupEl);
+    }
+
     groupsRoot.addEventListener("click", (e)=>{
       const head = e.target.closest(".groupHead");
       if(head){
         const groupEl = head.closest(".group");
         const willOpen = groupEl.classList.contains("collapsed");
-        groupEl.classList.toggle("collapsed");
-        if(willOpen){
-          loadImagesForGroup(groupEl); // ✅ 只加载这一组
-        }
+        if(willOpen) openGroup(groupEl);
+        else groupEl.classList.add("collapsed");
         return;
       }
 
       const ph = e.target.closest(".photo");
       if(ph){
         const groupEl = ph.closest(".group");
-        if(groupEl) loadImagesForGroup(groupEl); // 确保已加载本组
+        if(groupEl && groupEl.classList.contains("collapsed")){
+          openGroup(groupEl);
+        }else if(groupEl){
+          loadImagesForGroup(groupEl);
+        }
         const flat = Number(ph.dataset.flat || 0);
         setViewerByFlat(flat);
       }
     });
 
-    // 全部展开：展开时逐组加载
     expandAllBtn.addEventListener("click", ()=>{
       groupsRoot.querySelectorAll(".group").forEach(g=>{
-        const wasCollapsed = g.classList.contains("collapsed");
+        const was = g.classList.contains("collapsed");
         g.classList.remove("collapsed");
-        if(wasCollapsed) loadImagesForGroup(g);
+        if(was) loadImagesForGroup(g);
       });
     });
     collapseAllBtn.addEventListener("click", ()=>{
       groupsRoot.querySelectorAll(".group").forEach(g=> g.classList.add("collapsed"));
     });
+
+    // ================== 启动开场 ==================
+    runIntro();
   </script>
 </body>
 </html>
