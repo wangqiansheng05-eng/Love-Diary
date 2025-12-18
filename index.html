@@ -30,7 +30,6 @@
       overflow-x:hidden;
     }
 
-    /* 背景星点 */
     .stars, .stars:before, .stars:after{
       position:fixed; inset:0;
       content:"";
@@ -231,7 +230,6 @@
       opacity:.9;
     }
 
-    /* 心形飘落 */
     .heart{
       position:fixed;
       left:0; top:-20px;
@@ -260,7 +258,6 @@
       }
     }
 
-    /* 弹窗 */
     .modalMask{
       position:fixed; inset:0;
       background:#00000075;
@@ -283,7 +280,6 @@
     .modal p{margin:0 0 14px; color:var(--muted); line-height:1.75}
     .modal .row{display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap}
 
-    /* 右上角小提示：点击开启音乐 */
     .hint{
       position:absolute;
       right:14px; top:14px;
@@ -300,7 +296,6 @@
     }
     .hint b{color:var(--accent2)}
 
-    /* ================== 开场动画（3秒，爱心填充 + 进度条 + 仪式感） ================== */
     .intro{
       position:fixed; inset:0;
       display:flex;
@@ -392,7 +387,6 @@
       to{ opacity:0; transform: scale(1.01); pointer-events:none; }
     }
 
-    /* ================== 时间线：4组（可折叠 + 单独“美照”组） ================== */
     .timelinePanel{ margin-top:18px; }
     .timelineHeaderRow{
       display:flex;
@@ -479,12 +473,6 @@
     .tMeta{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
     .tDate{ font-weight:800; color:#fff; letter-spacing:.2px; }
     .tTitle{ color: var(--accent2); font-weight:700; }
-    .tText{
-      margin: 8px 0 10px;
-      color: var(--muted);
-      line-height:1.75;
-      font-size: 14px;
-    }
 
     .photoGrid{
       display:grid;
@@ -514,7 +502,6 @@
     }
     .photo:hover img{ transform: scale(1.08); }
 
-    /* 大图预览 + 滑动 */
     .viewerMask{
       position:fixed; inset:0;
       background:#00000085;
@@ -583,7 +570,6 @@
 </head>
 
 <body>
-  <!-- 开场动画层 -->
   <div id="intro" class="intro">
     <div class="introCard">
       <div class="spark" id="spark" aria-hidden="true"></div>
@@ -612,9 +598,7 @@
 
       <div class="introText" id="introText">正在把心意装进爱心里…</div>
 
-      <div class="bar">
-        <div id="barFill" class="barFill"></div>
-      </div>
+      <div class="bar"><div id="barFill" class="barFill"></div></div>
       <div id="barNum" class="barNum">0%</div>
     </div>
   </div>
@@ -660,7 +644,6 @@
             </div>
           </div>
 
-          <!-- ✅ 4分组时间线 -->
           <div class="panel timelinePanel" id="timeline">
             <div class="timelineHeaderRow">
               <h2 style="margin:0;">我们的回忆时间线</h2>
@@ -697,15 +680,7 @@
 
           <div class="panel">
             <h2>背景音乐（小狗）</h2>
-            <p class="tiny">
-              我选了这首歌当背景音乐，<br/>
-              因为每次听到它，都会想到你。
-            </p>
-            <p class="tiny" style="opacity:.85">
-              如果它没有马上播放，<br/>
-              轻轻点一下页面，让我陪你久一点。
-            </p>
-
+            <p class="tiny">如果它没有马上播放，轻轻点一下页面，让我陪你久一点。</p>
             <audio id="bgm" preload="auto" loop>
               <source src="/Love-Diary/static/bgm.mp3" type="audio/mpeg">
             </audio>
@@ -720,7 +695,6 @@
     </div>
   </div>
 
-  <!-- 告白弹窗 -->
   <div class="modalMask" id="mask">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
       <h3 id="mTitle">我想对你说</h3>
@@ -732,7 +706,6 @@
     </div>
   </div>
 
-  <!-- 图片预览弹窗 -->
   <div class="viewerMask" id="viewerMask">
     <div class="viewer" role="dialog" aria-modal="true">
       <button class="viewerClose" id="viewerClose" type="button">✕</button>
@@ -907,12 +880,6 @@
 我们从 ${SINCE} 在一起。
 今天是第 ${dayCount} 天。
 
-桐桐，我很喜欢你。
-喜欢到——看到好看的云、好吃的店、好笑的梗，第一反应都是：想告诉你。
-你不需要一直很快乐，你只要做你自己就好；你累的时候，我想做你的靠山，做你的“没关系”。
-我想把未来认真地交到你手里：不是轰轰烈烈一下子，而是每天多爱你一点点。
-谢谢你出现在我的生活里，也谢谢你愿意和我一起走。
-
 —— ${FROM_NAME}`;
       try{
         await navigator.clipboard.writeText(text);
@@ -951,85 +918,89 @@
     });
     tryPlay();
 
-    // ================== 时间线：仅4组（按你需求） ==================
-    // 你只要把图片放到对应文件夹，并保证文件名一致即可
-      const TIMELINE = [
-    // ① 2025-05-02 第一次见面（6张）
-    {
-      group: "2025-05-02 第一次见面",
-      date: "2025-05-02",
-      title: "第一次见面",
-      photos: [
-        { src: "assets/photos/2025-05-02-first/01.jpg" },
-        { src: "assets/photos/2025-05-02-first/02.jpg" },
-        { src: "assets/photos/2025-05-02-first/03.jpg" },
-        { src: "assets/photos/2025-05-02-first/04.jpg" },
-        { src: "assets/photos/2025-05-02-first/05.jpg" },
-        { src: "assets/photos/2025-05-02-first/06.jpg" },
-      ]
-    },
-  
-    // ② 2025-07-02 第二次见面（4张）
-    {
-      group: "2025-07-02 第二次见面",
-      date: "2025-07-02",
-      title: "第二次见面",
-      photos: [
-        { src: "assets/photos/2025-07-02-second/01.jpg" },
-        { src: "assets/photos/2025-07-02-second/02.jpg" },
-        { src: "assets/photos/2025-07-02-second/03.jpg" },
-        { src: "assets/photos/2025-07-02-second/04.jpg" },
-      ]
-    },
-  
-    // ③ 2025-09-19 第三次见面（4张）
-    {
-      group: "2025-09-19 第三次见面",
-      date: "2025-09-19",
-      title: "第三次见面",
-      photos: [
-        { src: "assets/photos/2025-09-19-third/01.jpg" },
-        { src: "assets/photos/2025-09-19-third/02.jpg" },
-        { src: "assets/photos/2025-09-19-third/03.jpg" },
-        { src: "assets/photos/2025-09-19-third/04.jpg" },
-      ]
-    },
-  
-    // ④ 大宝宝的美照（23张，置顶组）
-    {
-      group: "大宝宝的美照",
-      date: "2025-01-01",
-      title: "大宝宝的美照",
-      photos: [
-        { src: "assets/photos/tongtong/01.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/02.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/03.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/04.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/05.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/06.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/07.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/08.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/09.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/10.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/11.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/12.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/13.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/14.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/15.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/16.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/17.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/18.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/19.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/20.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/21.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/22.jpg", tags:["tongtong"] },
-        { src: "assets/photos/tongtong/23.jpg", tags:["tongtong"] },
-      ]
-    },
-  ];
+    // ================== 时间线（你的配置 그대로） ==================
+    const TIMELINE = [
+      {
+        group: "2025-05-02 第一次见面",
+        date: "2025-05-02",
+        title: "第一次见面",
+        photos: [
+          { src: "assets/photos/2025-05-02-first/01.jpg" },
+          { src: "assets/photos/2025-05-02-first/02.jpg" },
+          { src: "assets/photos/2025-05-02-first/03.jpg" },
+          { src: "assets/photos/2025-05-02-first/04.jpg" },
+          { src: "assets/photos/2025-05-02-first/05.jpg" },
+          { src: "assets/photos/2025-05-02-first/06.jpg" },
+        ]
+      },
+      {
+        group: "2025-07-02 第二次见面",
+        date: "2025-07-02",
+        title: "第二次见面",
+        photos: [
+          { src: "assets/photos/2025-07-02-second/01.jpg" },
+          { src: "assets/photos/2025-07-02-second/02.jpg" },
+          { src: "assets/photos/2025-07-02-second/03.jpg" },
+          { src: "assets/photos/2025-07-02-second/04.jpg" },
+        ]
+      },
+      {
+        group: "2025-09-19 第三次见面",
+        date: "2025-09-19",
+        title: "第三次见面",
+        photos: [
+          { src: "assets/photos/2025-09-19-third/01.jpg" },
+          { src: "assets/photos/2025-09-19-third/02.jpg" },
+          { src: "assets/photos/2025-09-19-third/03.jpg" },
+          { src: "assets/photos/2025-09-19-third/04.jpg" },
+        ]
+      },
+      {
+        group: "大宝宝的美照",
+        date: "2025-01-01",
+        title: "大宝宝的美照",
+        photos: [
+          { src: "assets/photos/tongtong/01.jpg" },
+          { src: "assets/photos/tongtong/02.jpg" },
+          { src: "assets/photos/tongtong/03.jpg" },
+          { src: "assets/photos/tongtong/04.jpg" },
+          { src: "assets/photos/tongtong/05.jpg" },
+          { src: "assets/photos/tongtong/06.jpg" },
+          { src: "assets/photos/tongtong/07.jpg" },
+          { src: "assets/photos/tongtong/08.jpg" },
+          { src: "assets/photos/tongtong/09.jpg" },
+          { src: "assets/photos/tongtong/10.jpg" },
+          { src: "assets/photos/tongtong/11.jpg" },
+          { src: "assets/photos/tongtong/12.jpg" },
+          { src: "assets/photos/tongtong/13.jpg" },
+          { src: "assets/photos/tongtong/14.jpg" },
+          { src: "assets/photos/tongtong/15.jpg" },
+          { src: "assets/photos/tongtong/16.jpg" },
+          { src: "assets/photos/tongtong/17.jpg" },
+          { src: "assets/photos/tongtong/18.jpg" },
+          { src: "assets/photos/tongtong/19.jpg" },
+          { src: "assets/photos/tongtong/20.jpg" },
+          { src: "assets/photos/tongtong/21.jpg" },
+          { src: "assets/photos/tongtong/22.jpg" },
+          { src: "assets/photos/tongtong/23.jpg" },
+        ]
+      },
+    ];
 
+    // ====== 新增：每组“已加载/总计”统计（定位到底是不是路径问题） ======
+    const groupStats = new Map(); // groupName -> {total, ok}
+    function initStats(){
+      const groups = [...new Set(TIMELINE.map(x=>x.group))];
+      groups.forEach(g=>{
+        const total = TIMELINE.filter(x=>x.group===g).reduce((s,it)=> s + (it.photos?.length||0), 0);
+        groupStats.set(g, { total, ok: 0 });
+      });
+    }
+    initStats();
 
-    // ===== 大图预览：统一索引，支持左右切换/滑动 =====
+    function pad2(n){ return String(n).padStart(2,"0"); }
+
+    // ===== 大图预览 =====
     const viewerMask = document.getElementById("viewerMask");
     const viewerImg = document.getElementById("viewerImg");
     const viewerCap = document.getElementById("viewerCap");
@@ -1051,7 +1022,7 @@
       const item = TIMELINE[ref.entryIdx];
       const photo = item.photos[ref.photoIdx];
       viewerImg.src = photo.src;
-      viewerCap.textContent = `${item.group}${photo.cap ? " · " + photo.cap : ""}`;
+      viewerCap.textContent = item.group;
       viewerMask.style.display = "flex";
     }
     function closeViewer(){
@@ -1071,7 +1042,6 @@
       if(e.key === "ArrowRight") step(1);
     });
 
-    // 手机滑动
     let touchX0 = null, touchY0 = null;
     viewerImg.addEventListener("touchstart", (e)=>{
       const t = e.touches[0];
@@ -1091,7 +1061,7 @@
       }
     }, {passive:true});
 
-    // ===== 渲染 4 分组 + 折叠 =====
+    // ===== 渲染 =====
     const groupsRoot = document.getElementById("timelineGroups");
     const expandAllBtn = document.getElementById("expandAll");
     const collapseAllBtn = document.getElementById("collapseAll");
@@ -1106,16 +1076,19 @@
 
     function renderGroup(groupName, entries){
       const totalPhotos = entries.reduce((a,it)=> a + (it.photos?.length||0), 0);
+      const stat = groupStats.get(groupName) || {total: totalPhotos, ok:0};
 
-      const bodyHtml = groupName === "大宝宝的美照"
+      const isBeauty = groupName === "大宝宝的美照";
+
+      const bodyHtml = isBeauty
         ? `
           <div class="photoGrid">
-            ${entries.flatMap((it, entryIdxGlobal)=>{
+            ${entries.flatMap((it)=>{
               const eIdx = TIMELINE.indexOf(it);
               return (it.photos||[]).map((p, photoIdx)=> {
                 const flat = findFlatIndex(eIdx, photoIdx);
                 return `<div class="photo" data-flat="${flat}">
-                          <img src="${p.src}" alt="${p.cap || "桐桐"}" loading="lazy">
+                          <img data-group="${groupName}" src="${p.src}" alt="照片" loading="lazy">
                         </div>`;
               });
             }).join("")}
@@ -1128,7 +1101,7 @@
               const photos = (it.photos||[]).map((p, photoIdx)=>{
                 const flat = findFlatIndex(eIdx, photoIdx);
                 return `<div class="photo" data-flat="${flat}">
-                          <img src="${p.src}" alt="${p.cap || "回忆照片"}" loading="lazy">
+                          <img data-group="${groupName}" src="${p.src}" alt="照片" loading="lazy">
                         </div>`;
               }).join("");
 
@@ -1139,7 +1112,6 @@
                     <div class="tDate">${it.date}</div>
                     <div class="tTitle">${it.title}</div>
                   </div>
-                  ${it.text ? `<div class="tText">${it.text}</div>` : ``}
                   <div class="photoGrid">${photos}</div>
                 </div>
               `;
@@ -1152,7 +1124,7 @@
           <div class="groupHead">
             <div class="groupTitle">
               <b>${groupName}</b>
-              <span>${entries.length} 条 · ${totalPhotos} 张</span>
+              <span class="gcount" data-gcount="${groupName}">已加载 ${stat.ok} / ${stat.total}</span>
             </div>
             <div class="chev">▾</div>
           </div>
@@ -1164,7 +1136,6 @@
     }
 
     function renderTimeline(){
-      // 固定顺序：美照置顶，其余按你给的时间顺序
       const groups = [
         "大宝宝的美照",
         "2025-05-02 第一次见面",
@@ -1181,12 +1152,40 @@
       const html = groups.map(g=> renderGroup(g, map.get(g))).join("");
       groupsRoot.innerHTML = html;
 
-      // 默认：只展开前2组（你可改）
       const els = Array.from(groupsRoot.querySelectorAll(".group"));
       els.forEach((g, idx)=>{
         if(idx >= 2) g.classList.add("collapsed");
       });
+
+      // 关键：绑定图片 load/error，实时统计，并把 404 的图隐藏
+      bindImageHealthCheck();
     }
+
+    function updateGroupCount(groupName){
+      const stat = groupStats.get(groupName);
+      if(!stat) return;
+      const el = groupsRoot.querySelector(`.gcount[data-gcount="${CSS.escape(groupName)}"]`);
+      if(el) el.textContent = `已加载 ${stat.ok} / ${stat.total}`;
+    }
+
+    function bindImageHealthCheck(){
+      const imgs = groupsRoot.querySelectorAll("img[data-group]");
+      imgs.forEach(img=>{
+        const g = img.getAttribute("data-group");
+        img.addEventListener("load", ()=>{
+          const st = groupStats.get(g);
+          if(st){ st.ok += 1; updateGroupCount(g); }
+        }, { once:true });
+
+        img.addEventListener("error", ()=>{
+          // 404 直接隐藏这张（否则你以为“没渲染出来”）
+          const wrap = img.closest(".photo");
+          if(wrap) wrap.style.display = "none";
+          updateGroupCount(g);
+        }, { once:true });
+      });
+    }
+
     renderTimeline();
 
     groupsRoot.addEventListener("click", (e)=>{
@@ -1211,4 +1210,3 @@
   </script>
 </body>
 </html>
-
