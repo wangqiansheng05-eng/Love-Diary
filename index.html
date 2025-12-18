@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>给陈桐桐的一封情书</title>
+  <meta name="description" content="王强强写给陈桐桐的小惊喜：一封会下爱心雨的情书" />
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#2b1055;
+      --card:#ffffff10;
+      --text:#f7f7fb;
+      --muted:#c9c9d6;
+      --accent:#ff5da2;
+      --accent2:#ffd6e7;
+      --shadow: 0 18px 50px #00000055;
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC","Microsoft YaHei", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #ff5da228, transparent 55%),
+        radial-gradient(900px 600px at 80% 30%, #7c3aed25, transparent 55%),
+        linear-gradient(140deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    /* 背景星点 */
+    .stars, .stars:before, .stars:after{
+      position:fixed; inset:0;
+      content:"";
+      background-repeat:repeat;
+      background-size: 220px 220px;
+      opacity:.35;
+      pointer-events:none;
+      mix-blend-mode: screen;
+    }
+    .stars{
+      background-image:
+        radial-gradient(#ffffff55 1px, transparent 1px),
+        radial-gradient(#ffffff33 1px, transparent 1px);
+      background-position: 0 0, 80px 120px;
+      animation: drift 40s linear infinite;
+    }
+    .stars:before{
+      background-image: radial-gradient(#ffffff33 1px, transparent 1px);
+      background-size: 260px 260px;
+      background-position: 50px 70px;
+      animation: drift 65s linear infinite reverse;
+      opacity:.25;
+    }
+    .stars:after{
+      background-image: radial-gradient(#ff5da255 1px, transparent 1px);
+      background-size: 320px 320px;
+      background-position: 140px 30px;
+      animation: drift 90s linear infinite;
+      opacity:.18;
+    }
+    @keyframes drift{
+      from{transform:translate3d(0,0,0)}
+      to{transform:translate3d(-220px,-220px,0)}
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px 16px 90px;
+    }
+
+    .card{
+      width:min(960px, 100%);
+      background:linear-gradient(180deg, #ffffff14, #ffffff08);
+      border:1px solid #ffffff1f;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:18px 18px 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;background:#ff5da2;
+      box-shadow: 0 0 18px #ff5da2aa;
+    }
+    .dot:nth-child(2){background:#ffd166; box-shadow:0 0 18px #ffd166aa}
+    .dot:nth-child(3){background:#4ade80; box-shadow:0 0 18px #4ade80aa}
+
+    .content{
+      padding: 18px 26px 26px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+    }
+    @media (max-width: 860px){
+      .content{grid-template-columns:1fr}
+      .footer{flex-direction:column}
+    }
+
+    h1{
+      margin: 6px 0 10px;
+      font-size: clamp(28px, 3.2vw, 44px);
+      letter-spacing: .6px;
+      line-height:1.12;
+    }
+    .subtitle{
+      margin:0 0 18px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+    .badgeRow{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin: 10px 0 16px;
+    }
+    .badge{
+      border:1px solid #ffffff22;
+      background:#ffffff10;
+      padding:8px 10px;
+      border-radius:999px;
+      color:#fff;
+      font-size:13px;
+    }
+    .badge span{color:var(--accent2); font-weight:700}
+
+    .letter{
+      background: #00000018;
+      border: 1px solid #ffffff1a;
+      border-radius: 16px;
+      padding: 18px 18px 16px;
+      position:relative;
+    }
+    .letter:before{
+      content:"";
+      position:absolute; inset:-1px;
+      border-radius: 16px;
+      background: radial-gradient(700px 220px at 10% 0%, #ff5da22a, transparent 60%),
+                  radial-gradient(520px 220px at 90% 10%, #7c3aed25, transparent 60%);
+      pointer-events:none;
+    }
+    .letter p{
+      position:relative;
+      margin:0 0 12px;
+      line-height:1.9;
+      font-size: 16px;
+      color: #f3f3ff;
+    }
+    .sig{
+      position:relative;
+      margin-top: 10px;
+      color: var(--accent2);
+      font-weight:600;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .sig span{opacity:.92}
+
+    .side{display:flex;flex-direction:column;gap:14px;}
+    .panel{
+      background: #00000018;
+      border: 1px solid #ffffff1a;
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .panel h2{margin:0 0 10px;font-size:16px;color:#fff;letter-spacing:.4px;}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;}
+    .chip{
+      border:1px solid #ffffff22;
+      background:#ffffff10;
+      padding:8px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex; gap:8px; align-items:center;
+    }
+    .chip b{color:#fff; font-weight:600}
+
+    .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top: 10px;}
+    button{
+      border:0;
+      cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color:#0b1020;
+      font-weight:800;
+      background: linear-gradient(90deg, var(--accent), #ffb4d6);
+      box-shadow: 0 12px 30px #ff5da230;
+      transition: transform .08s ease, filter .2s ease;
+      letter-spacing:.2px;
+    }
+    button:hover{filter:brightness(1.05)}
+    button:active{transform: translateY(1px) scale(.99)}
+    .ghost{
+      background:#ffffff14;
+      color:#fff;
+      border:1px solid #ffffff2a;
+      box-shadow:none;
+      font-weight:700;
+    }
+    .tiny{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:13px;
+    }
+
+    .footer{
+      padding: 0 26px 24px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      opacity:.9;
+    }
+
+    /* 心形飘落 */
+    .heart{
+      position:fixed;
+      left:0; top:-20px;
+      width:16px; height:16px;
+      transform: rotate(45deg);
+      background: var(--accent);
+      opacity:.85;
+      pointer-events:none;
+      filter: drop-shadow(0 8px 10px #00000040);
+      animation: fall linear forwards;
+      z-index: 9999;
+    }
+    .heart:before, .heart:after{
+      content:"";
+      position:absolute;
+      width:16px; height:16px;
+      border-radius:50%;
+      background: inherit;
+    }
+    .heart:before{left:-8px; top:0}
+    .heart:after{left:0; top:-8px}
+    @keyframes fall{
+      to{
+        transform: translate3d(var(--dx), 105vh, 0) rotate(45deg);
+        opacity:0;
+      }
+    }
+
+    /* 弹窗 */
+    .modalMask{
+      position:fixed; inset:0;
+      background:#00000075;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 16px;
+      z-index: 99999;
+    }
+    .modal{
+      width:min(560px, 100%);
+      background: #0b1020f2;
+      border:1px solid #ffffff22;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .modal h3{margin:0 0 8px; font-size:18px}
+    .modal p{margin:0 0 14px; color:var(--muted); line-height:1.75}
+    .modal .row{display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap}
+
+    /* 右上角小提示：点击开启音乐 */
+    .hint{
+      position:absolute;
+      right:14px; top:14px;
+      font-size:12px;
+      color:#fff;
+      opacity:.9;
+      background:#00000035;
+      border:1px solid #ffffff22;
+      padding:8px 10px;
+      border-radius:999px;
+      backdrop-filter: blur(10px);
+      display:flex; gap:8px; align-items:center;
+    }
+    .hint b{color:var(--accent2)}
+  </style>
+</head>
+
+<body>
+  <div class="stars"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="hint" id="musicHint" title="为了兼容手机浏览器，需要点击一次才可播放">
+        🎵 <b>点一下</b> 开启我们的歌
+      </div>
+
+      <div class="topbar" aria-hidden="true">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span>只给陈桐桐的小惊喜（王强强专属）</span>
+      </div>
+
+      <div class="content">
+        <section>
+          <h1>写给 <span id="toName">陈桐桐</span> 的情书</h1>
+
+          <p class="subtitle">
+            我们从 <b id="sinceDateText">2025-05-02</b> 在一起那天起，日子就变得更值得期待了。<br/>
+            今天是我们在一起的第 <b id="dayCount">229</b> 天，我想把这份小心意，悄悄放到你面前。
+          </p>
+
+          <div class="badgeRow">
+            <div class="badge">👫 在一起：<span id="dayCount2">229</span> 天</div>
+            <div class="badge">📅 纪念日：<span id="sincePretty">2025年5月2日</span></div>
+            <div class="badge">🗓️ 今天：<span id="today">—</span></div>
+          </div>
+
+          <div class="letter">
+            <p id="line1">桐桐，我很喜欢你。</p>
+            <p id="line2">喜欢到——看到好看的云、好吃的店、好笑的梗，第一反应都是：想告诉你。</p>
+            <p id="line3">你不需要一直很快乐，你只要做你自己就好；你累的时候，我想做你的靠山，做你的“没关系”。</p>
+            <p id="line4">我想把未来认真地交到你手里：不是轰轰烈烈一下子，而是每天多爱你一点点。</p>
+            <p id="line5">所以今天这个小惊喜，只想对你说：谢谢你出现在我的生活里，也谢谢你愿意和我一起走。</p>
+
+            <div class="sig">
+              <span>永远偏爱你的人：<b id="fromName">王强强</b></span>
+              <span>— 送给你（<span id="today2">—</span>）</span>
+            </div>
+          </div>
+
+        </section>
+
+        <aside class="side">
+          <div class="panel">
+            <h2>我们的关键词</h2>
+            <div class="chips">
+              <div class="chip">✨ <b>心动</b>：见你就加速</div>
+              <div class="chip">🌙 <b>陪伴</b>：不缺席</div>
+              <div class="chip">🍬 <b>甜</b>：你说了算</div>
+              <div class="chip">🧸 <b>抱抱</b>：随叫随到</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>互动一下</h2>
+            <div class="btns">
+              <button id="btnHearts">下点爱心雨</button>
+              <button class="ghost" id="btnConfess">我有话想说</button>
+              <button class="ghost" id="btnCopy">复制这封情书</button>
+              <button class="ghost" id="btnMusic">播放/暂停音乐</button>
+            </div>
+            <p class="tiny">
+            </p>
+          </div>
+
+         <div class="panel">
+            <h2>背景音乐（小狗）</h2>
+            <p class="tiny">
+              我选了这首歌当背景音乐，<br/>
+              因为每次听到它，都会想到你。
+            </p>
+            <p class="tiny" style="opacity:.85">
+              如果它没有马上播放，<br/>
+              轻轻点一下页面，让我陪你久一点。
+            </p>
+
+            <!-- ✅ 推荐：用本地 static/bgm.mp3 -->
+            <audio id="bgm" preload="auto" loop>
+              <source src="/static/bgm.mp3" type="audio/mpeg">
+            </audio>
+
+            <p class="tiny" style="opacity:.85">
+
+            </p>
+          </div>
+        </aside>
+      </div>
+
+      <div class="footer">
+        <span>Made with ❤ by 王强强</span>
+        <span> </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalMask" id="mask">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <h3 id="mTitle">我想对你说</h3>
+      <p id="mText">桐桐，今天不是想煽情，只是想更认真地爱你。</p>
+      <div class="row">
+        <button class="ghost" id="mClose">我知道啦</button>
+        <button id="mMore">再说一句</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== 你们的信息（可改） ======
+    const FROM_NAME = "王强强";
+    const TO_NAME = "陈桐桐";
+    const SINCE = "2025-05-02"; // 在一起的日期（YYYY-MM-DD）
+
+    // 如果你想强制显示“第229天”，把下面改成 true
+    const FORCE_DAY_COUNT = false;
+    const FORCED_DAYS = 229;
+
+    // ====== 日期与天数 ======
+    function parseYMD(s){
+      const [y,m,d] = s.split("-").map(Number);
+      return new Date(y, m-1, d);
+    }
+    function daysBetween(a, b){
+      // 以“本地0点”计算更稳定
+      const A = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+      const B = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+      const ms = B - A;
+      return Math.floor(ms / 86400000) + 1; // +1：把开始当天算作第1天（更符合情侣“第N天”习惯）
+    }
+    function zhDate(d){
+      return d.toLocaleDateString("zh-CN", {year:"numeric", month:"long", day:"numeric"});
+    }
+
+    // 填名字
+    document.getElementById("fromName").textContent = FROM_NAME;
+    document.getElementById("toName").textContent = TO_NAME;
+
+    // 填今天
+    const today = new Date();
+    const todayStr = zhDate(today);
+    document.getElementById("today").textContent = todayStr;
+    document.getElementById("today2").textContent = todayStr;
+
+    // 纪念日展示
+    const sinceDate = parseYMD(SINCE);
+    document.getElementById("sinceDateText").textContent = SINCE;
+    document.getElementById("sincePretty").textContent = zhDate(sinceDate);
+
+    // 计算第N天
+    const computed = daysBetween(sinceDate, today);
+    const dayCount = FORCE_DAY_COUNT ? FORCED_DAYS : computed;
+    document.getElementById("dayCount").textContent = dayCount;
+    document.getElementById("dayCount2").textContent = dayCount;
+
+    // ====== 爱心雨 ======
+    function spawnHeart(){
+      const h = document.createElement("div");
+      h.className = "heart";
+      const x = Math.random() * window.innerWidth;
+      const dx = (Math.random() * 2 - 1) * 120 + "px";
+      const dur = (Math.random()*1.2 + 2.2).toFixed(2) + "s";
+      const size = (Math.random()*10 + 10).toFixed(0) + "px";
+      const op = (Math.random()*0.35 + 0.55).toFixed(2);
+
+      h.style.left = x + "px";
+      h.style.setProperty("--dx", dx);
+      h.style.animationDuration = dur;
+      h.style.width = size;
+      h.style.height = size;
+      h.style.opacity = op;
+
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), (parseFloat(dur)+0.2)*1000);
+    }
+    document.getElementById("btnHearts").addEventListener("click", ()=>{
+      const n = 60;
+      for(let i=0;i<n;i++) setTimeout(spawnHeart, i*38);
+    });
+
+    // ====== 弹窗告白 ======
+    const mask = document.getElementById("mask");
+    const mText = document.getElementById("mText");
+    const lines = [
+      "我喜欢你，是那种想认真走到最后的喜欢。",
+      "你开心的时候，我想和你一起笑；你难过的时候，我想第一个抱住你。",
+      "以后不管生活多吵，我都想站在你这边。",
+      "我想成为那个：你想到就会笑的人。",
+      "桐桐，把你的未来分我一点点吧，我会用力珍惜。"
+    ];
+    let idx = 0;
+
+    document.getElementById("btnConfess").addEventListener("click", ()=>{
+      mask.style.display = "flex";
+      idx = 0;
+      mText.textContent = "桐桐，今天不是想煽情，只是想更认真地爱你。";
+    });
+    document.getElementById("mClose").addEventListener("click", ()=>{ mask.style.display = "none"; });
+    document.getElementById("mMore").addEventListener("click", ()=>{
+      mText.textContent = lines[idx % lines.length];
+      idx++;
+    });
+    mask.addEventListener("click", (e)=>{ if(e.target === mask) mask.style.display = "none"; });
+
+    // ====== 复制情书 ======
+    document.getElementById("btnCopy").addEventListener("click", async ()=>{
+      const text =
+`写给 ${TO_NAME} 的情书
+我们从 ${SINCE} 在一起。
+今天是第 ${dayCount} 天。
+
+桐桐，我很喜欢你。
+喜欢到——看到好看的云、好吃的店、好笑的梗，第一反应都是：想告诉你。
+你不需要一直很快乐，你只要做你自己就好；你累的时候，我想做你的靠山，做你的“没关系”。
+我想把未来认真地交到你手里：不是轰轰烈烈一下子，而是每天多爱你一点点。
+谢谢你出现在我的生活里，也谢谢你愿意和我一起走。
+
+—— ${FROM_NAME}`;
+      try{
+        await navigator.clipboard.writeText(text);
+        alert("已复制到剪贴板啦！");
+      }catch(err){
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        alert("已复制到剪贴板啦！");
+      }
+    });
+
+    // ====== 背景音乐（移动端更稳：第一次交互后播放） ======
+    const bgm = document.getElementById("bgm");
+    const hint = document.getElementById("musicHint");
+    let unlocked = false;
+
+    async function tryPlay(){
+      try{
+        await bgm.play();
+        hint.style.display = "none";
+        unlocked = true;
+      }catch(e){
+        // 被浏览器策略拦截时，保持提示
+      }
+    }
+
+    // 第一次任何点击都尝试播放（符合手机策略）
+    window.addEventListener("click", ()=>{
+      if(!unlocked) tryPlay();
+    }, { once:false, passive:true });
+
+    document.getElementById("btnMusic").addEventListener("click", async ()=>{
+      if(bgm.paused){
+        await tryPlay();
+      }else{
+        bgm.pause();
+        hint.style.display = "flex";
+        hint.innerHTML = "🎵 <b>已暂停</b> 再点播放";
+      }
+    });
+
+    // 页面进入时也试一次（桌面端可能直接成功）
+    tryPlay();
+  </script>
+</body>
+</html>
