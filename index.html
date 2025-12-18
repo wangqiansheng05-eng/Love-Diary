@@ -48,14 +48,14 @@
       filter: saturate(1.06);
     }
 
-    /* ================== 背景：飘动照片（你上传的照片） ================== */
+    /* ================== 背景：飘动照片（音频优先 + 慢预加载） ================== */
     .floatBg{
       position:fixed;
       inset:0;
       z-index: 0;
       pointer-events:none;
       overflow:hidden;
-      opacity:.75;
+      opacity:.80; /* ✅ 总体透明度想调就改这里 */
       filter: saturate(1.06) contrast(1.02);
     }
     .floatPic{
@@ -70,6 +70,13 @@
       transform: translate3d(0,0,0);
       backdrop-filter: blur(2px);
       will-change: transform, opacity;
+    }
+    /* ✅ 手机/低端机：降低绘制成本 */
+    @media (max-width: 520px){
+      .floatPic{
+        box-shadow: 0 10px 30px #00000025;
+        backdrop-filter: none;
+      }
     }
     .floatPic img{
       width:100%;
@@ -517,11 +524,7 @@
       display:block;
     }
     .group.collapsed .groupBody{ display:none; }
-
-    /* ✅ 展开动画：JS 展开时短暂加 opening */
-    .group.opening .groupBody{
-      animation: fadeUp .35s ease both;
-    }
+    .group.opening .groupBody{ animation: fadeUp .35s ease both; }
     @keyframes fadeUp{
       from{ opacity:0; transform: translateY(10px); }
       to{ opacity:1; transform:none; }
@@ -660,7 +663,7 @@
     .viewerNav.left{ left:10px; }
     .viewerNav.right{ right:10px; }
 
-    /* 音乐进度条样式（更有质感一点） */
+    /* 音乐进度条样式 */
     input[type="range"]{
       -webkit-appearance:none;
       appearance:none;
@@ -691,7 +694,7 @@
 </head>
 
 <body>
-  <!-- ✅ 背景飘动照片层（每次打开随机抽12张使用） -->
+  <!-- ✅ 背景飘动照片层（音频优先 + 慢预加载） -->
   <div class="floatBg" id="floatBg" aria-hidden="true"></div>
 
   <!-- 开场动画层 -->
@@ -816,10 +819,8 @@
               进度条可以拖动，下一曲会自动续上氛围。
             </p>
 
-            <!-- ✅ 用 JS 控制 src（便于切歌） -->
             <audio id="bgm" preload="auto"></audio>
 
-            <!-- ✅ 可拖动进度条 -->
             <div style="margin-top:10px;">
               <input id="seek" type="range" min="0" max="1000" value="0" style="width:100%;">
               <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:6px;">
@@ -1128,7 +1129,7 @@
       const t = PLAYLIST[trackIndex];
 
       bgm.src = t.src;
-      bgm.loop = false;        // ✅ 整套歌单循环（不单曲 loop）
+      bgm.loop = false;
       bgm.preload = "auto";
       try{ bgm.load(); }catch(e){}
 
@@ -1164,19 +1165,12 @@
       loadTrack(trackIndex + 1, autoPlay);
     }
 
-    // 播放/暂停联动
     bgm.addEventListener("play", ()=> setMusicUI(true));
     bgm.addEventListener("pause", ()=> setMusicUI(false));
-
-    // 单曲结束 -> 下一首
     bgm.addEventListener("ended", ()=> nextTrack(true));
-
-    // 元数据
     bgm.addEventListener("loadedmetadata", ()=>{
       durTimeEl.textContent = fmt(bgm.duration);
     });
-
-    // 进度刷新
     bgm.addEventListener("timeupdate", ()=>{
       if(isSeeking) return;
       curTimeEl.textContent = fmt(bgm.currentTime);
@@ -1186,7 +1180,6 @@
       }
     });
 
-    // 拖动进度条
     seek.addEventListener("input", ()=>{
       isSeeking = true;
       if(isFinite(bgm.duration) && bgm.duration > 0){
@@ -1205,7 +1198,6 @@
     btnMusic.addEventListener("click", togglePlay);
     btnNext.addEventListener("click", ()=> nextTrack(!bgm.paused));
 
-    // ✅ 首次交互：优先解锁音乐
     function firstGesture(){
       if(!unlocked) tryPlay();
       window.removeEventListener("pointerdown", firstGesture);
@@ -1216,16 +1208,13 @@
     window.addEventListener("touchstart", firstGesture, {passive:true});
     window.addEventListener("click", firstGesture, {passive:true});
 
-    // 初始化第一首
     loadTrack(0, false);
 
-    // ================== 背景飘动照片：每次打开随机抽12张 ==================
+    // ================== 背景飘动：音频优先 + 慢预加载 + 加载几张飘几张 ==================
     const floatBg = document.getElementById("floatBg");
 
-    // ✅ 你把参与“背景飘动”的照片都填到这里（越多越随机）
-    //    路径示例：assets/floating/01.jpg
     const FLOAT_MANIFEST = [
-      "assets/photos/tongtong/01.jpg",
+       "assets/photos/tongtong/01.jpg",
       "assets/photos/tongtong/02.jpg",
       "assets/photos/tongtong/03.jpg",
       "assets/photos/tongtong/04.jpg",
@@ -1248,7 +1237,7 @@
       "assets/photos/tongtong/21.jpg",
       "assets/photos/tongtong/22.jpg",
       "assets/photos/tongtong/23.jpg",
-      // "assets/floating/14.jpg",
+      // 更多继续加...
     ];
 
     function shuffle(arr){
@@ -1260,27 +1249,76 @@
       return a;
     }
 
-    // 每次打开页面，随机抽 12 张作为本次背景池
     const FLOAT_POOL = shuffle(FLOAT_MANIFEST).slice(0, Math.min(12, FLOAT_MANIFEST.length));
+    const FLOAT_READY = [];
+    let preloadIdx = 0;
+
+    const isMobile = window.matchMedia("(max-width: 520px)").matches;
+    const FLOAT_SPAWN_INTERVAL_MS_MOBILE = 1800;
+    const FLOAT_SPAWN_INTERVAL_MS_DESKTOP = 900;
+    const FLOAT_MAX_ACTIVE_MOBILE = 7;
+    const FLOAT_MAX_ACTIVE_DESKTOP = 14;
+
+    function preloadNextFloat(){
+      if(preloadIdx >= FLOAT_POOL.length) return;
+
+      const src = FLOAT_POOL[preloadIdx++];
+      const img = new Image();
+      img.decoding = "async";
+      img.onload = () => { FLOAT_READY.push(src); };
+      img.onerror = () => {};
+      img.src = src;
+    }
+
+    let preloadTimer = null;
+    function startFloatPreloadSlow(){
+      if(preloadTimer) return;
+
+      const step = () => {
+        preloadNextFloat();
+        if(preloadIdx < FLOAT_POOL.length){
+          if("requestIdleCallback" in window){
+            window.requestIdleCallback(step, { timeout: 1200 });
+          }else{
+            preloadTimer = setTimeout(step, 800);
+          }
+        }
+      };
+
+      setTimeout(()=>{
+        if("requestIdleCallback" in window){
+          window.requestIdleCallback(step, { timeout: 1200 });
+        }else{
+          preloadTimer = setTimeout(step, 800);
+        }
+      }, 900);
+    }
 
     function spawnFloatPic(){
-      if(!floatBg || FLOAT_POOL.length === 0) return;
+      if(!floatBg) return;
+      if(FLOAT_READY.length === 0) return;
+
+      const active = floatBg.querySelectorAll(".floatPic").length;
+      const maxActive = isMobile ? FLOAT_MAX_ACTIVE_MOBILE : FLOAT_MAX_ACTIVE_DESKTOP;
+      if(active >= maxActive) return;
 
       const wrap = document.createElement("div");
       wrap.className = "floatPic";
 
       const img = document.createElement("img");
-      const src = FLOAT_POOL[Math.floor(Math.random()*FLOAT_POOL.length)];
+      const src = FLOAT_READY[Math.floor(Math.random()*FLOAT_READY.length)];
       img.src = src;
+      img.loading = "lazy";
+      img.decoding = "async";
       wrap.appendChild(img);
 
-      // 动画参数（更柔和一点）
-      const x = Math.random()*100;                 // vw
-      const dx = (Math.random()*2 - 1) * 18;       // vw
-      const r = (Math.random()*2 - 1) * 8;         // deg
+      const x = Math.random()*100;
+      const dx = (Math.random()*2 - 1) * 18;
+      const r = (Math.random()*2 - 1) * 8;
       const op = (Math.random()*0.55 + 0.50).toFixed(2);
       const dur = (Math.random()*10 + 18).toFixed(2);
-      const sizeW = Math.floor(Math.random()*60 + 130);
+
+      const sizeW = Math.floor(Math.random()*60 + (isMobile ? 110 : 130));
       const sizeH = Math.floor(sizeW * (Math.random()*0.35 + 1.25));
 
       wrap.style.setProperty("--x", x + "vw");
@@ -1298,17 +1336,28 @@
       setTimeout(()=> wrap.remove(), (Number(dur)+1)*1000);
     }
 
-    let floatTimer = null;
-    function startFloating(){
-      if(floatTimer) return;
-      for(let i=0;i<6;i++) setTimeout(spawnFloatPic, i*220);
-      floatTimer = setInterval(spawnFloatPic, 900);
-    }
-    // 你想一直飘：直接启动
-    startFloating();
+    let floatSpawnTimer = null;
+    function startFloatingSoft(){
+      if(floatSpawnTimer) return;
 
-    // （可选）如果你想“只有音乐播放时才飘”，把上面的 startFloating() 删掉，改成：
-    // bgm.addEventListener("play", ()=> startFloating());
+      startFloatPreloadSlow();
+      preloadNextFloat();
+      setTimeout(preloadNextFloat, 600);
+
+      const interval = isMobile ? FLOAT_SPAWN_INTERVAL_MS_MOBILE : FLOAT_SPAWN_INTERVAL_MS_DESKTOP;
+      floatSpawnTimer = setInterval(spawnFloatPic, interval);
+    }
+
+    // ✅ 音频准备好后再启动飘动（音频优先）
+    bgm.addEventListener("loadeddata", ()=>{ startFloatingSoft(); }, { once:true });
+    bgm.addEventListener("play", ()=>{ startFloatingSoft(); });
+
+    // ✅ 兜底：用户一直不播放时，只慢慢预加载，不飘（不抢资源）
+    setTimeout(()=>{
+      if(FLOAT_READY.length === 0 && bgm.readyState < 2){
+        startFloatPreloadSlow();
+      }
+    }, 3500);
 
     // ================== 时间线：按组懒加载（展开才加载） ==================
     const TIMELINE = [
@@ -1421,7 +1470,6 @@
       if(e.key === "ArrowRight") step(1);
     });
 
-    // 手机滑动
     let touchX0 = null, touchY0 = null;
     viewerImg.addEventListener("touchstart", (e)=>{
       const t = e.touches[0];
@@ -1541,7 +1589,6 @@
     }
     renderTimeline();
 
-    // ✅ 手风琴：一次只展开一组 + 展开动画 + 懒加载该组
     function openGroup(groupEl){
       groupsRoot.querySelectorAll(".group").forEach(g=>{
         if(g !== groupEl) g.classList.add("collapsed");
@@ -1595,6 +1642,3 @@
   </script>
 </body>
 </html>
-
-
-
