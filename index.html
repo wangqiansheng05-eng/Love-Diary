@@ -296,15 +296,114 @@
       border-radius:999px;
       backdrop-filter: blur(10px);
       display:flex; gap:8px; align-items:center;
+      z-index: 2;
     }
     .hint b{color:var(--accent2)}
+
+    /* ================== 开场动画（3秒，填充式爱心 + 进度条） ================== */
+    .intro{
+      position:fixed; inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index: 999999;
+      background:
+        radial-gradient(900px 600px at 30% 20%, #ff5da228, transparent 60%),
+        radial-gradient(800px 520px at 80% 30%, #7c3aed25, transparent 60%),
+        linear-gradient(140deg, var(--bg1), var(--bg2));
+    }
+    .introCard{
+      width:min(520px, 92vw);
+      background:#ffffff10;
+      border:1px solid #ffffff22;
+      border-radius: 22px;
+      padding: 22px 20px 18px;
+      box-shadow: var(--shadow);
+      text-align:center;
+      backdrop-filter: blur(12px);
+    }
+    .introText{
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+
+    .introHeart{
+      width: 120px; height: 120px;
+      margin: 0 auto;
+      position: relative;
+      transform: rotate(45deg);
+      background: var(--accent);
+      filter: drop-shadow(0 14px 35px #ff5da240);
+      border-radius: 14px;
+      overflow:hidden;
+
+      /* 用 inset box-shadow 模拟“从下往上填充” */
+      --fill: 0px; /* 0~120px */
+      box-shadow: inset 0 calc(120px - var(--fill)) 0 0 #ffffff22;
+      transition: box-shadow .08s linear;
+    }
+    .introHeart:before,
+    .introHeart:after{
+      content:"";
+      position:absolute;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: inherit;
+    }
+    .introHeart:before{ left:-60px; top:0; }
+    .introHeart:after{ left:0; top:-60px; }
+
+    .bar{
+      margin: 16px auto 8px;
+      width: 100%;
+      height: 12px;
+      background:#00000030;
+      border:1px solid #ffffff1f;
+      border-radius: 999px;
+      overflow:hidden;
+    }
+    .barFill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--accent), #ffb4d6);
+      border-radius: 999px;
+      transition: width .08s linear;
+    }
+    .barNum{
+      font-size: 12px;
+      color: var(--accent2);
+      opacity:.95;
+    }
+
+    .intro.fadeOut{
+      animation: introFade .55s ease forwards;
+    }
+    @keyframes introFade{
+      to{ opacity:0; transform: scale(1.01); pointer-events:none; }
+    }
   </style>
 </head>
 
 <body>
+  <!-- 开场动画层 -->
+  <div id="intro" class="intro">
+    <div class="introCard">
+      <div class="introHeart" aria-hidden="true"></div>
+      <div class="introText">正在把心意装进爱心里…</div>
+
+      <div class="bar">
+        <div id="barFill" class="barFill"></div>
+      </div>
+      <div id="barNum" class="barNum">0%</div>
+    </div>
+  </div>
+
   <div class="stars"></div>
 
-  <div class="wrap">
+  <!-- 主内容先隐藏，开场结束后显示 -->
+  <div class="wrap" id="main" style="display:none;">
     <div class="card">
       <div class="hint" id="musicHint" title="为了兼容手机浏览器，需要点击一次才可播放">
         🎵 <b>点一下</b> 开启我们的歌
@@ -342,7 +441,6 @@
               <span>— 送给你（<span id="today2">—</span>）</span>
             </div>
           </div>
-
         </section>
 
         <aside class="side">
@@ -364,11 +462,10 @@
               <button class="ghost" id="btnCopy">复制这封情书</button>
               <button class="ghost" id="btnMusic">播放/暂停音乐</button>
             </div>
-            <p class="tiny">
-            </p>
+            <p class="tiny"></p>
           </div>
 
-         <div class="panel">
+          <div class="panel">
             <h2>背景音乐（小狗）</h2>
             <p class="tiny">
               我选了这首歌当背景音乐，<br/>
@@ -379,14 +476,12 @@
               轻轻点一下页面，让我陪你久一点。
             </p>
 
-            <!-- ✅ 推荐：用本地 static/bgm.mp3 -->
             <audio id="bgm" preload="auto" loop>
+              <!-- 你已验证可用的路径 -->
               <source src="/Love-Diary/static/bgm.mp3" type="audio/mpeg">
             </audio>
 
-            <p class="tiny" style="opacity:.85">
-
-            </p>
+            <p class="tiny" style="opacity:.85"></p>
           </div>
         </aside>
       </div>
@@ -410,53 +505,83 @@
   </div>
 
   <script>
-    // ====== 你们的信息（可改） ======
+    // ================== 开场：3秒进度条 + 填充式爱心 ==================
+    const intro = document.getElementById("intro");
+    const main = document.getElementById("main");
+    const barFill = document.getElementById("barFill");
+    const barNum = document.getElementById("barNum");
+    const introHeart = intro.querySelector(".introHeart");
+
+    const INTRO_MS = 3000; // 3秒
+
+    function runIntro(){
+      const start = performance.now();
+
+      function tick(now){
+        const t = Math.min(1, (now - start) / INTRO_MS);
+        const p = Math.floor(t * 100);
+
+        barFill.style.width = p + "%";
+        barNum.textContent = p + "%";
+
+        const fillPx = Math.floor(120 * t); // 0~120px
+        introHeart.style.setProperty("--fill", fillPx + "px");
+
+        if(t < 1){
+          requestAnimationFrame(tick);
+        }else{
+          // 结束：显示正文、淡出开场
+          main.style.display = "";
+          intro.classList.add("fadeOut");
+          setTimeout(()=> intro.remove(), 650);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    runIntro();
+
+    // ================== 原有逻辑：信息与日期 ==================
     const FROM_NAME = "王强强";
     const TO_NAME = "陈桐桐";
     const SINCE = "2025-05-02"; // 在一起的日期（YYYY-MM-DD）
 
-    // 如果你想强制显示“第229天”，把下面改成 true
     const FORCE_DAY_COUNT = false;
     const FORCED_DAYS = 229;
 
-    // ====== 日期与天数 ======
     function parseYMD(s){
       const [y,m,d] = s.split("-").map(Number);
       return new Date(y, m-1, d);
     }
     function daysBetween(a, b){
-      // 以“本地0点”计算更稳定
       const A = new Date(a.getFullYear(), a.getMonth(), a.getDate());
       const B = new Date(b.getFullYear(), b.getMonth(), b.getDate());
       const ms = B - A;
-      return Math.floor(ms / 86400000) + 1; // +1：把开始当天算作第1天（更符合情侣“第N天”习惯）
+      return Math.floor(ms / 86400000) + 1;
     }
     function zhDate(d){
       return d.toLocaleDateString("zh-CN", {year:"numeric", month:"long", day:"numeric"});
     }
 
-    // 填名字
     document.getElementById("fromName").textContent = FROM_NAME;
     document.getElementById("toName").textContent = TO_NAME;
 
-    // 填今天
     const today = new Date();
     const todayStr = zhDate(today);
     document.getElementById("today").textContent = todayStr;
     document.getElementById("today2").textContent = todayStr;
 
-    // 纪念日展示
     const sinceDate = parseYMD(SINCE);
     document.getElementById("sinceDateText").textContent = SINCE;
     document.getElementById("sincePretty").textContent = zhDate(sinceDate);
 
-    // 计算第N天
     const computed = daysBetween(sinceDate, today);
     const dayCount = FORCE_DAY_COUNT ? FORCED_DAYS : computed;
     document.getElementById("dayCount").textContent = dayCount;
     document.getElementById("dayCount2").textContent = dayCount;
 
-    // ====== 爱心雨 ======
+    // ================== 爱心雨 ==================
     function spawnHeart(){
       const h = document.createElement("div");
       h.className = "heart";
@@ -481,7 +606,7 @@
       for(let i=0;i<n;i++) setTimeout(spawnHeart, i*38);
     });
 
-    // ====== 弹窗告白 ======
+    // ================== 弹窗告白 ==================
     const mask = document.getElementById("mask");
     const mText = document.getElementById("mText");
     const lines = [
@@ -505,7 +630,7 @@
     });
     mask.addEventListener("click", (e)=>{ if(e.target === mask) mask.style.display = "none"; });
 
-    // ====== 复制情书 ======
+    // ================== 复制情书 ==================
     document.getElementById("btnCopy").addEventListener("click", async ()=>{
       const text =
 `写给 ${TO_NAME} 的情书
@@ -533,7 +658,7 @@
       }
     });
 
-    // ====== 背景音乐（移动端更稳：第一次交互后播放） ======
+    // ================== 背景音乐（移动端更稳：第一次交互后播放） ==================
     const bgm = document.getElementById("bgm");
     const hint = document.getElementById("musicHint");
     let unlocked = false;
@@ -548,7 +673,6 @@
       }
     }
 
-    // 第一次任何点击都尝试播放（符合手机策略）
     window.addEventListener("click", ()=>{
       if(!unlocked) tryPlay();
     }, { once:false, passive:true });
@@ -563,9 +687,8 @@
       }
     });
 
-    // 页面进入时也试一次（桌面端可能直接成功）
+    // 桌面端可能直接成功；移动端大概率需要点击一次
     tryPlay();
   </script>
 </body>
 </html>
-
