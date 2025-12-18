@@ -93,14 +93,16 @@
       mix-blend-mode: screen;
       opacity:.85;
     }
-    @keyframes floatUp{
+
+    /* ✅ 新：从“网页最底部”出生（不是屏幕底部） */
+    @keyframes floatUpDoc{
       from{
-        transform: translate3d(var(--x), 110vh, 0) rotate(var(--r));
+        transform: translate3d(var(--x), calc(var(--startY) * 1px), 0) rotate(var(--r));
         opacity:0;
       }
       10%{ opacity: var(--op); }
       to{
-        transform: translate3d(calc(var(--x) + var(--dx)), -30vh, 0) rotate(calc(var(--r) + 12deg));
+        transform: translate3d(calc(var(--x) + var(--dx)), calc(var(--endY) * 1px), 0) rotate(calc(var(--r) + 12deg));
         opacity:0;
       }
     }
@@ -819,7 +821,8 @@
               进度条可以拖动，下一曲会自动续上氛围。
             </p>
 
-            <audio id="bgm" preload="auto"></audio>
+            <!-- ✅ 改：先 metadata，等用户触发播放时再 auto -->
+            <audio id="bgm" preload="metadata"></audio>
 
             <div style="margin-top:10px;">
               <input id="seek" type="range" min="0" max="1000" value="0" style="width:100%;">
@@ -1130,7 +1133,8 @@
 
       bgm.src = t.src;
       bgm.loop = false;
-      bgm.preload = "auto";
+      // ✅ 这里不强行 auto；等真正 tryPlay 时再拉满
+      bgm.preload = "metadata";
       try{ bgm.load(); }catch(e){}
 
       trackNameEl.textContent = t.name;
@@ -1143,6 +1147,10 @@
 
     async function tryPlay(){
       try{
+        // ✅ 播放前把音频 preload 拉满 + 重新 load，确保优先缓冲
+        bgm.preload = "auto";
+        try { bgm.load(); } catch(e) {}
+
         await bgm.play();
         unlocked = true;
         setMusicUI(true);
@@ -1214,7 +1222,7 @@
     const floatBg = document.getElementById("floatBg");
 
     const FLOAT_MANIFEST = [
-       "assets/photos/tongtong/01.jpg",
+      "assets/photos/tongtong/01.jpg",
       "assets/photos/tongtong/02.jpg",
       "assets/photos/tongtong/03.jpg",
       "assets/photos/tongtong/04.jpg",
@@ -1237,7 +1245,6 @@
       "assets/photos/tongtong/21.jpg",
       "assets/photos/tongtong/22.jpg",
       "assets/photos/tongtong/23.jpg",
-      // 更多继续加...
     ];
 
     function shuffle(arr){
@@ -1254,13 +1261,20 @@
     let preloadIdx = 0;
 
     const isMobile = window.matchMedia("(max-width: 520px)").matches;
-    const FLOAT_SPAWN_INTERVAL_MS_MOBILE = 1800;
-    const FLOAT_SPAWN_INTERVAL_MS_DESKTOP = 900;
-    const FLOAT_MAX_ACTIVE_MOBILE = 7;
-    const FLOAT_MAX_ACTIVE_DESKTOP = 14;
+
+    // ✅ 移动端初期更少，逐步增加
+    let FLOAT_MAX_ACTIVE_MOBILE = 2;
+    const FLOAT_MAX_ACTIVE_MOBILE_MAX = 6;
+    const FLOAT_MAX_ACTIVE_DESKTOP = 12;
+
+    // ✅ 预加载更慢、更串行
+    const PRELOAD_GAP = isMobile ? 1800 : 1200;
 
     function preloadNextFloat(){
       if(preloadIdx >= FLOAT_POOL.length) return;
+
+      // ✅ 移动端：音乐没播放就不继续预载（避免抢资源导致断歌）
+      if(isMobile && bgm && bgm.paused) return;
 
       const src = FLOAT_POOL[preloadIdx++];
       const img = new Image();
@@ -1276,27 +1290,28 @@
 
       const step = () => {
         preloadNextFloat();
-        if(preloadIdx < FLOAT_POOL.length){
-          if("requestIdleCallback" in window){
-            window.requestIdleCallback(step, { timeout: 1200 });
-          }else{
-            preloadTimer = setTimeout(step, 800);
-          }
+
+        if(preloadIdx >= FLOAT_POOL.length){
+          clearTimeout(preloadTimer);
+          preloadTimer = null;
+          return;
+        }
+
+        if("requestIdleCallback" in window){
+          window.requestIdleCallback(()=>{ preloadTimer = setTimeout(step, PRELOAD_GAP); }, { timeout: 1200 });
+        }else{
+          preloadTimer = setTimeout(step, PRELOAD_GAP);
         }
       };
 
-      setTimeout(()=>{
-        if("requestIdleCallback" in window){
-          window.requestIdleCallback(step, { timeout: 1200 });
-        }else{
-          preloadTimer = setTimeout(step, 800);
-        }
-      }, 900);
+      // ✅ 更晚一点再开始（而且第一次也只动一下）
+      preloadTimer = setTimeout(step, isMobile ? 1600 : 900);
     }
 
     function spawnFloatPic(){
       if(!floatBg) return;
       if(FLOAT_READY.length === 0) return;
+      if(bgm && bgm.paused) return; // ✅ 音乐暂停就不飘，避免抢资源
 
       const active = floatBg.querySelectorAll(".floatPic").length;
       const maxActive = isMobile ? FLOAT_MAX_ACTIVE_MOBILE : FLOAT_MAX_ACTIVE_DESKTOP;
@@ -1326,11 +1341,18 @@
       wrap.style.setProperty("--r", r + "deg");
       wrap.style.setProperty("--op", op);
 
+      // ✅ 关键：从“网页最底部”出生（不是屏幕底部）
+      const doc = document.documentElement;
+      const startY = (doc.scrollHeight - window.scrollY) + 40;            // 页面底部再往下点
+      const endY = -Math.max(260, window.innerHeight * 0.35);             // 飘到上方
+      wrap.style.setProperty("--startY", String(startY));
+      wrap.style.setProperty("--endY", String(endY));
+
       wrap.style.width = sizeW + "px";
       wrap.style.height = sizeH + "px";
       wrap.style.left = "0";
       wrap.style.top = "0";
-      wrap.style.animation = `floatUp ${dur}s linear forwards`;
+      wrap.style.animation = `floatUpDoc ${dur}s linear forwards`;
 
       floatBg.appendChild(wrap);
       setTimeout(()=> wrap.remove(), (Number(dur)+1)*1000);
@@ -1340,24 +1362,46 @@
     function startFloatingSoft(){
       if(floatSpawnTimer) return;
 
+      // ✅ 先慢慢预载（串行）
       startFloatPreloadSlow();
-      preloadNextFloat();
-      setTimeout(preloadNextFloat, 600);
 
-      const interval = isMobile ? FLOAT_SPAWN_INTERVAL_MS_MOBILE : FLOAT_SPAWN_INTERVAL_MS_DESKTOP;
-      floatSpawnTimer = setInterval(spawnFloatPic, interval);
+      // ✅ 先塞一张进 READY（若允许）
+      preloadNextFloat();
+
+      // ✅ 移动端：慢慢把最大飘图数从2提升到6
+      if(isMobile){
+        let step = 0;
+        const up = setInterval(()=>{
+          if(bgm.paused){ clearInterval(up); return; }
+          step++;
+          FLOAT_MAX_ACTIVE_MOBILE = Math.min(FLOAT_MAX_ACTIVE_MOBILE_MAX, 2 + step);
+          if(FLOAT_MAX_ACTIVE_MOBILE >= FLOAT_MAX_ACTIVE_MOBILE_MAX) clearInterval(up);
+        }, 7000);
+      }
+
+      // ✅ 移动端更慢，桌面稍快
+      const interval = isMobile ? 2400 : 1100;
+      floatSpawnTimer = setInterval(()=>{ spawnFloatPic(); }, interval);
     }
 
-    // ✅ 音频准备好后再启动飘动（音频优先）
-    bgm.addEventListener("loadeddata", ()=>{ startFloatingSoft(); }, { once:true });
-    bgm.addEventListener("play", ()=>{ startFloatingSoft(); });
+    // ✅ 超关键：音乐稳定播放一会儿再启动飘图体系（更不容易断歌）
+    let floatArmed = false;
+    bgm.addEventListener("play", ()=>{
+      if(floatArmed) return;
+      floatArmed = true;
 
-    // ✅ 兜底：用户一直不播放时，只慢慢预加载，不飘（不抢资源）
+      const delay = isMobile ? 3800 : 2200;
+      setTimeout(()=>{
+        if(!bgm.paused) startFloatingSoft();
+      }, delay);
+    });
+
+    // ✅ 兜底：用户不播放时不抢资源（只预载1张，不循环）
     setTimeout(()=>{
       if(FLOAT_READY.length === 0 && bgm.readyState < 2){
-        startFloatPreloadSlow();
+        preloadNextFloat();
       }
-    }, 3500);
+    }, 4500);
 
     // ================== 时间线：按组懒加载（展开才加载） ==================
     const TIMELINE = [
