@@ -1,1 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Protected Page</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root{
+      --bg1:#0b1020; --bg2:#2b1055;
+      --accent:#ff5da2; --accent2:#ffd6e7;
+      --card:#ffffff12; --border:#ffffff22;
+      --text:#f7f7fb; --muted:#c9c9d6;
+      --shadow: 0 18px 50px #00000055;
+      --r: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC","Microsoft YaHei", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #ff5da228, transparent 55%),
+        radial-gradient(900px 600px at 80% 30%, #7c3aed25, transparent 55%),
+        linear-gradient(140deg, var(--bg1), var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      overflow:hidden;
+    }
+    .card{
+      width:min(520px, 94vw);
+      background: linear-gradient(180deg, #ffffff14, #ffffff08);
+      border:1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 16px;
+      backdrop-filter: blur(10px);
+    }
+    h1{margin: 6px 0 8px; font-size: 20px; letter-spacing:.3px;}
+    p{margin: 0 0 14px; color: var(--muted); line-height: 1.75; font-size: 14px;}
+    .row{display:flex; gap:10px;}
+    input{
+      flex:1;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border:1px solid #ffffff26;
+      outline:none;
+      background:#00000025;
+      color:#fff;
+      font-size: 14px;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border:0;
+      cursor:pointer;
+      font-weight: 900;
+      color:#0b1020;
+      background: linear-gradient(90deg, var(--accent), #ffb4d6);
+      box-shadow: 0 12px 30px #ff5da230;
+    }
+    .err{margin-top:10px; color:#ffb4d6; display:none; font-size: 13px;}
+    .hint{margin-top:10px; color:#ffffffb0; font-size:12px;}
+    .small{opacity:.8; font-size:12px; margin-top:14px;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>只给你的小世界 💗</h1>
+    <p>请输入密码进入。<br>（提示：只有你我知道的那句话。）</p>
+
+    <div class="row">
+      <input id="pwd" type="password" placeholder="请输入密码" autocomplete="off" />
+      <button id="go" type="button">进入</button>
+    </div>
+    <div class="err" id="err">密码不对哦，再试一次。</div>
+    <div class="hint">如果手机键盘遮挡输入框，点一下空白处再输入。</div>
+    <div class="small">Made with ❤</div>
+  </div>
+
+  <script>
+    // ========= 配置区（你只需要改这里） =========
+    const TARGET = "app.html";        // 你的真实页面文件名
+    const PASSWORD = "0502";        // ✅ 改成你要的密码（建议 8 位以上）
+    // ==========================================
+
+    // 提示：这不是强安全，只是“访问门槛”。真正强安全要上服务器/Cloudflare。
+    const pwdEl = document.getElementById("pwd");
+    const errEl = document.getElementById("err");
+    const goBtn = document.getElementById("go");
+
+    function ok(){
+      errEl.style.display = "none";
+      // 用 sessionStorage：关掉浏览器标签就失效（更像“临时钥匙”）
+      sessionStorage.setItem("love_pwd_ok", "1");
+      // 跳转到真实页面
+      location.href = TARGET;
+    }
+
+    function bad(){
+      errEl.style.display = "block";
+      pwdEl.value = "";
+      pwdEl.focus();
+    }
+
+    function check(){
+      const v = pwdEl.value || "";
+      if(v === PASSWORD) ok();
+      else bad();
+    }
+
+    goBtn.addEventListener("click", check);
+    pwdEl.addEventListener("keydown", (e)=>{ if(e.key === "Enter") check(); });
+
+    // 进入 app.html 时也做一次保护：如果没通过就弹回 index.html
+    // （这段逻辑会在 app.html 里再加一份更稳，见下面第 3 步）
+  </script>
+</body>
+</html>
 
