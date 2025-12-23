@@ -683,6 +683,13 @@
 </head>
 
 <body>
+  <script>
+  // 没从 index.html 正确进入（没拿到钥匙）就打回去
+  if (sessionStorage.getItem("love_pwd_ok") !== "1") {
+    location.replace("index.html");
+  }
+</script>
+
   <!-- ✅ 背景飘动照片层（全页面随机漂浮） -->
   <div class="floatBg" id="floatBg" aria-hidden="true"></div>
 
@@ -1667,3 +1674,4 @@
   </script>
 </body>
 </html>
+
