@@ -3,16 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Protected Page</title>
+  <title>只给你的小世界</title>
   <meta name="robots" content="noindex,nofollow" />
   <style>
     :root{
-      --bg1:#0b1020; --bg2:#2b1055;
-      --accent:#ff5da2; --accent2:#ffd6e7;
-      --card:#ffffff12; --border:#ffffff22;
-      --text:#f7f7fb; --muted:#c9c9d6;
+      --bg1:#0b1020;
+      --bg2:#2b1055;
+      --card:#ffffff10;
+      --border:#ffffff22;
+      --text:#f7f7fb;
+      --muted:#c9c9d6;
+      --accent:#ff5da2;
+      --accent2:#ffd6e7;
       --shadow: 0 18px 50px #00000055;
-      --r: 18px;
+      --r: 20px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -30,8 +34,50 @@
       padding:18px;
       overflow:hidden;
     }
-    .card{
+
+    /* stars */
+    .stars, .stars:before, .stars:after{
+      position:fixed; inset:0;
+      content:"";
+      background-repeat:repeat;
+      background-size: 220px 220px;
+      opacity:.35;
+      pointer-events:none;
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+    .stars{
+      background-image:
+        radial-gradient(#ffffff55 1px, transparent 1px),
+        radial-gradient(#ffffff33 1px, transparent 1px);
+      background-position: 0 0, 80px 120px;
+      animation: drift 42s linear infinite;
+    }
+    .stars:before{
+      background-image: radial-gradient(#ffffff33 1px, transparent 1px);
+      background-size: 260px 260px;
+      background-position: 50px 70px;
+      animation: drift 66s linear infinite reverse;
+      opacity:.25;
+    }
+    .stars:after{
+      background-image: radial-gradient(#ff5da255 1px, transparent 1px);
+      background-size: 320px 320px;
+      background-position: 140px 30px;
+      animation: drift 92s linear infinite;
+      opacity:.18;
+    }
+    @keyframes drift{
+      from{transform:translate3d(0,0,0)}
+      to{transform:translate3d(-220px,-220px,0)}
+    }
+
+    .wrap{
       width:min(520px, 94vw);
+      position:relative;
+      z-index: 1;
+    }
+    .card{
       background: linear-gradient(180deg, #ffffff14, #ffffff08);
       border:1px solid var(--border);
       border-radius: var(--r);
@@ -39,85 +85,313 @@
       padding: 18px 18px 16px;
       backdrop-filter: blur(10px);
     }
-    h1{margin: 6px 0 8px; font-size: 20px; letter-spacing:.3px;}
-    p{margin: 0 0 14px; color: var(--muted); line-height: 1.75; font-size: 14px;}
-    .row{display:flex; gap:10px;}
-    input{
+    .top{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background:var(--accent);
+      box-shadow: 0 0 18px #ff5da2aa;
+    }
+    h1{
+      margin: 6px 0 6px;
+      font-size: 20px;
+      letter-spacing:.3px;
+      line-height:1.2;
+    }
+    p{
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 14px;
+    }
+
+    .field{
+      display:flex;
+      gap:10px;
+      align-items:stretch;
+      margin-top: 8px;
+    }
+    .inputWrap{
       flex:1;
-      padding: 12px 12px;
-      border-radius: 12px;
+      position:relative;
+    }
+    input{
+      width:100%;
+      padding: 12px 42px 12px 12px;
+      border-radius: 14px;
       border:1px solid #ffffff26;
       outline:none;
       background:#00000025;
       color:#fff;
       font-size: 14px;
     }
+    .eye{
+      position:absolute;
+      right:10px; top:50%;
+      transform: translateY(-50%);
+      width:28px;height:28px;
+      border-radius:10px;
+      border:1px solid #ffffff24;
+      background:#ffffff10;
+      color:#fff;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      user-select:none;
+    }
     button{
       padding: 12px 14px;
-      border-radius: 12px;
+      border-radius: 14px;
       border:0;
       cursor:pointer;
       font-weight: 900;
       color:#0b1020;
       background: linear-gradient(90deg, var(--accent), #ffb4d6);
       box-shadow: 0 12px 30px #ff5da230;
+      transition: transform .08s ease, filter .2s ease;
+      white-space:nowrap;
     }
-    .err{margin-top:10px; color:#ffb4d6; display:none; font-size: 13px;}
-    .hint{margin-top:10px; color:#ffffffb0; font-size:12px;}
-    .small{opacity:.8; font-size:12px; margin-top:14px;}
+    button:hover{filter:brightness(1.05)}
+    button:active{transform: translateY(1px) scale(.99)}
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      filter:none;
+      transform:none;
+      box-shadow:none;
+    }
+
+    .err{
+      margin-top:10px;
+      color:#ffb4d6;
+      display:none;
+      font-size: 13px;
+    }
+    .ok{
+      margin-top:10px;
+      color:#b9ffdc;
+      display:none;
+      font-size: 13px;
+    }
+    .hint{
+      margin-top:10px;
+      color:#ffffffb0;
+      font-size:12px;
+      line-height:1.65;
+    }
+    .small{
+      opacity:.8;
+      font-size:12px;
+      margin-top:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      color:#ffffffa8;
+    }
+
+    /* subtle floating hearts */
+    .heart{
+      position:fixed;
+      left:0; top:-20px;
+      width:14px; height:14px;
+      transform: rotate(45deg);
+      background: var(--accent);
+      opacity:.20;
+      pointer-events:none;
+      filter: drop-shadow(0 8px 10px #00000030);
+      animation: fall linear forwards;
+      z-index: 0;
+    }
+    .heart:before, .heart:after{
+      content:"";
+      position:absolute;
+      width:14px; height:14px;
+      border-radius:50%;
+      background: inherit;
+    }
+    .heart:before{left:-7px; top:0}
+    .heart:after{left:0; top:-7px}
+    @keyframes fall{
+      to{
+        transform: translate3d(var(--dx), 105vh, 0) rotate(45deg);
+        opacity:0;
+      }
+    }
+    @media (max-width: 420px){
+      .small{justify-content:flex-start}
+    }
   </style>
 </head>
-<body>
-  <div class="card">
-    <h1>只给你的小世界 💗</h1>
-    <p>请输入密码进入。<br>（提示：只有你我知道的那句话。）</p>
 
-    <div class="row">
-      <input id="pwd" type="password" placeholder="请输入密码" autocomplete="off" />
-      <button id="go" type="button">进入</button>
+<body>
+  <div class="stars"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <span class="dot"></span>
+        <div>
+          <h1>只给你的小世界 💗</h1>
+          <p style="margin:0;">请输入密码进入（不对的密码会被温柔拒绝）。</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="inputWrap">
+          <input id="pwd" type="password" inputmode="numeric" placeholder="请输入密码" autocomplete="off" />
+          <div class="eye" id="eye" title="显示/隐藏">👁</div>
+        </div>
+        <button id="go" type="button">进入</button>
+      </div>
+
+      <div class="err" id="err">密码不对哦，再试一次。</div>
+      <div class="ok" id="ok">验证通过，正在打开…</div>
+
+      <div class="hint" id="hint">
+        小提示：手机键盘遮挡输入框时，点一下空白处再输入。<br>
+        连续输错次数过多会短暂冷却一下。
+      </div>
+
+      <div class="small">
+        <span>Made with ❤</span>
+        <span id="cooldown" style="display:none;">冷却中…</span>
+      </div>
     </div>
-    <div class="err" id="err">密码不对哦，再试一次。</div>
-    <div class="hint">如果手机键盘遮挡输入框，点一下空白处再输入。</div>
-    <div class="small">Made with ❤</div>
   </div>
 
   <script>
-    // ========= 配置区（你只需要改这里） =========
-    const TARGET = "app.html";        // 你的真实页面文件名
-    const PASSWORD = "0502";        // ✅ 改成你要的密码（建议 8 位以上）
+    // ================== 配置区 ==================
+    const TARGET = "app.html"; // 你的真实页面文件名（原情书页面）
+    // ✅ 密码 0502 的 SHA-256（不是明文密码）
+    const PASS_HASH_HEX = "a1133c2be1ac92a059e8345f2e6bd946d171d43c76ae442a2d744cb624c8b37a";
     // ==========================================
 
-    // 提示：这不是强安全，只是“访问门槛”。真正强安全要上服务器/Cloudflare。
-    const pwdEl = document.getElementById("pwd");
-    const errEl = document.getElementById("err");
-    const goBtn = document.getElementById("go");
-
-    function ok(){
-      errEl.style.display = "none";
-      // 用 sessionStorage：关掉浏览器标签就失效（更像“临时钥匙”）
-      sessionStorage.setItem("love_pwd_ok", "1");
-      // 跳转到真实页面
-      location.href = TARGET;
+    // 已通过则直接进（同一标签页有效）
+    if (sessionStorage.getItem("love_pwd_ok") === "1") {
+      location.replace(TARGET);
     }
 
-    function bad(){
-      errEl.style.display = "block";
+    const pwdEl = document.getElementById("pwd");
+    const errEl = document.getElementById("err");
+    const okEl  = document.getElementById("ok");
+    const goBtn = document.getElementById("go");
+    const eyeBtn = document.getElementById("eye");
+    const cdEl = document.getElementById("cooldown");
+
+    // 防暴力猜：错 5 次冷却 12 秒
+    const MAX_FAIL = 5;
+    const COOLDOWN_MS = 12000;
+
+    function now(){ return Date.now(); }
+    function getFail(){ return Number(localStorage.getItem("love_fail") || "0"); }
+    function setFail(n){ localStorage.setItem("love_fail", String(n)); }
+    function getCDUntil(){ return Number(localStorage.getItem("love_cd_until") || "0"); }
+    function setCDUntil(t){ localStorage.setItem("love_cd_until", String(t)); }
+
+    function setState({err=false, ok=false, msg=""}){
+      errEl.style.display = err ? "block" : "none";
+      okEl.style.display = ok ? "block" : "none";
+      if (msg && err) errEl.textContent = msg;
+      if (msg && ok) okEl.textContent = msg;
+    }
+
+    async function sha256Hex(s){
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+    }
+
+    function updateCooldownUI(){
+      const until = getCDUntil();
+      const remain = until - now();
+      if (remain > 0) {
+        const sec = Math.ceil(remain / 1000);
+        cdEl.style.display = "inline";
+        cdEl.textContent = `冷却中 ${sec}s…`;
+        goBtn.disabled = true;
+        return true;
+      } else {
+        cdEl.style.display = "none";
+        goBtn.disabled = false;
+        return false;
+      }
+    }
+
+    // 每 200ms 刷新冷却显示（开销很小）
+    setInterval(updateCooldownUI, 200);
+    updateCooldownUI();
+
+    function ok(){
+      setState({ok:true, err:false, msg:"验证通过，正在打开…"});
+      sessionStorage.setItem("love_pwd_ok", "1");
+      // 成功就清空失败计数
+      setFail(0);
+      setCDUntil(0);
+      setTimeout(()=> location.href = TARGET, 250);
+    }
+
+    function bad(customMsg){
+      const fails = getFail() + 1;
+      setFail(fails);
+
+      if (fails >= MAX_FAIL) {
+        const until = now() + COOLDOWN_MS;
+        setCDUntil(until);
+        setState({err:true, ok:false, msg:`输错次数有点多哦，等 ${Math.ceil(COOLDOWN_MS/1000)} 秒再试～`});
+        updateCooldownUI();
+      } else {
+        setState({err:true, ok:false, msg: customMsg || `密码不对哦（还剩 ${MAX_FAIL - fails} 次）`});
+      }
+
       pwdEl.value = "";
       pwdEl.focus();
     }
 
-    function check(){
-      const v = pwdEl.value || "";
-      if(v === PASSWORD) ok();
-      else bad();
+    async function check(){
+      if (updateCooldownUI()) return;
+
+      const v = (pwdEl.value || "").trim();
+      if (!v) return bad("先输入密码再进入哦～");
+
+      try{
+        const h = await sha256Hex(v);
+        if (h === PASS_HASH_HEX) ok();
+        else bad();
+      }catch(e){
+        bad("浏览器不支持加密校验（换 Chrome/Edge 试试）");
+      }
     }
 
     goBtn.addEventListener("click", check);
     pwdEl.addEventListener("keydown", (e)=>{ if(e.key === "Enter") check(); });
 
-    // 进入 app.html 时也做一次保护：如果没通过就弹回 index.html
-    // （这段逻辑会在 app.html 里再加一份更稳，见下面第 3 步）
+    eyeBtn.addEventListener("click", ()=>{
+      pwdEl.type = (pwdEl.type === "password") ? "text" : "password";
+      pwdEl.focus();
+    });
+
+    // 轻量飘心（不抢性能）
+    function spawnHeart(){
+      const h = document.createElement("div");
+      h.className = "heart";
+      const x = Math.random() * window.innerWidth;
+      const dx = (Math.random() * 2 - 1) * 120 + "px";
+      const dur = (Math.random()*2.2 + 3.2).toFixed(2) + "s";
+      h.style.left = x + "px";
+      h.style.setProperty("--dx", dx);
+      h.style.animationDuration = dur;
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), (parseFloat(dur)+0.2)*1000);
+    }
+    // 手机更少一点
+    const isMobile = window.matchMedia("(max-width: 520px)").matches;
+    setInterval(spawnHeart, isMobile ? 1500 : 950);
   </script>
 </body>
 </html>
-
